@@ -57,7 +57,7 @@ export default function portfolioReducer(state = initialState, action) {
             return state;
     }
 }
-
+//
 
 /* Shape of store
 

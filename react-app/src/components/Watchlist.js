@@ -9,6 +9,9 @@ import "./Watchlist.css";
 function Watchlist() {
   const stocks = useSelector((state) => state.stocks);
   const watchlist = useSelector((state) => state.watchlist);
+
+
+  console.log(watchlist, 'watchlist object000000000000000000000000000000000000000000000000000')
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -35,13 +38,13 @@ function Watchlist() {
             <div className="watchlist-components">
 
 
-              <Link to={`/asset/${watchedStock.ticker}`} className={"link-look"}>
+              <Link to={`/asset/${watchedStock.ticker}`} className="link-look">
                 <div className="ticker-name">{watchedStock.ticker}</div>
               </Link>
               <div
                 className="stock-logo"
                 style={{
-                  backgroundImage: `url('${stocks[watchedStock.ticker]?.logoURL
+                  backgroundImage: `url('${stocks[watchedStock.ticker]?.logo_url
                     }')`,
                 }} >
 

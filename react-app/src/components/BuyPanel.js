@@ -15,9 +15,13 @@ export default function BuyPanel({ ticker }) {
     const user = useSelector(state => state.session.user)
     const portfolio = useSelector(state => state.portfolio)
     const stocks = useSelector(state => state.stocks)
-    console.log(stocks, "stocks object so i can query price>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    console.log(portfolio[ticker], "stocks object so i can query price>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
 
-    useEffect(() => dispatch(getPortfolio()), [dispatch])
+    let currentPrice = 0
+
+    useEffect(() => {
+        dispatch(getPortfolio())
+    }, [dispatch])
     // update user.cash_balance on buys/sells
     // useEffect(()=> ,[portfolio.stock.share_count])
 
@@ -37,14 +41,14 @@ export default function BuyPanel({ ticker }) {
                     <button id='buy' onClick={async () => {
                         await dispatch(updateStock(ticker, "add"));
                         await dispatch(
-                            updateBalance(stocks[ticker].currentPrice.slice(1), "subtract")
+                            updateBalance(portfolio[ticker].basis, "subtract")
                         );
                     }}>Buy 1</button>
                     <br></br>
                     <button style={{ "background-color": "salmon" }} id='sell' onClick={async () => {
                         await dispatch(updateStock(ticker, "subtract"));
                         await dispatch(
-                            updateBalance(stocks[ticker].currentPrice.slice(1), "add")
+                            updateBalance(portfolio[ticker].basis, "add")
                         );
                     }}>Sell 1</button>
                 </div>
@@ -63,8 +67,8 @@ export default function BuyPanel({ ticker }) {
                 <WatchlistAddButton ticker={ticker} />
             </div>
 
+        </>
 
 
-
-        </>)
+    )
 }

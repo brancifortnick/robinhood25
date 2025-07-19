@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect
+from flask import Blueprint
 import requests
 
 
@@ -12,7 +12,7 @@ external_stocks = Blueprint('external_stocks', __name__)
 @external_stocks.route('/<ticker>')
 def get_single_stock(ticker):
     httpResponse = requests.get(
-        "https: // api.polygon.io/v2/aggs/ticker/" + ticker)
+        "https://api.polygon.io/v2/aggs/ticker/" + ticker)
     pythonData = httpResponse.json()
     print(f' ticker + {ticker}')
     return pythonData

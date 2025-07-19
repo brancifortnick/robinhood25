@@ -12,17 +12,23 @@ const loadOneStock = stock => ({
 });
 
 export const getSingleStock = (ticker) => async dispatch => {
-  const response = await fetch(`/api/stocks/${ticker}`);
+  try {
+    const response = await fetch(`/api/stocks/${ticker}`);
+    console.log(ticker, 'ticker===<> stock store')
+    if (response.ok) {
 
-  if (response.ok) {
-    const stock = await response.json();
-    dispatch(loadOneStock(stock));
-  };
+      const stock = await response.json();
+      console.log(stock, 'stock from response if ok')
+      dispatch(loadOneStock(stock));
+    }
+  } catch (error) {
+    console.log(error,)
+  }
 };
 
 export const getMultipleStocks = (tickersList) => async dispatch => {
   const stocks = [];
-  tickersList.forEach( async ticker => {
+  tickersList.forEach(async ticker => {
     const response = await fetch(`/api/stocks/${ticker}`);
 
     if (response.ok) {
