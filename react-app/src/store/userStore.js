@@ -2,7 +2,7 @@ import { setUser, SET_USER } from "./session"
 
 export const updateBalance = (amount, operator) => async (dispatch) => {
   try {
-    const response = await fetch(`api/users/user-balance/${amount}/${operator}`, {
+    const response = await fetch(`/api/users/user-balance/${amount}/${operator}`, {
       method: 'POST'
     })
     if (response.ok) {
