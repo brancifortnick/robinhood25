@@ -13,7 +13,7 @@ export default function HomePage() {
 
             <div id="homepage-left">
                 <div id="homepage-chart">
-                    <Stock ticker={"AMC"} />
+                    <Stock ticker={"AAPL"} />
                 </div>
 
                 <div id="homepage-portfolio-title">Your Portfolio</div>

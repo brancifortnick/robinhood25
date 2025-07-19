@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user
 from app.models import WatchlistStocks, db, watchlist_stocks
-
+from sqlalchemy.orm import query
 
 # GET api/watchlist-stocks/		------ backend good => double check front end
 # POST api/watchlist-stocks/:ticker

@@ -7,8 +7,10 @@ import "./Portfolio.css"
 //import thunks from store
 
 function Portfolio() {
-  const stocks = useSelector(state => state.stocks)
+  const stocks = useSelector(state => Object.values(state.stocks))
   const portfolio = useSelector(state => state.portfolio)
+
+  console.log(portfolio, 'stocks', 'portgolio from portfolio component')
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -38,8 +40,8 @@ function Portfolio() {
                 <Link to={`/asset/${portfolio[s].ticker}`} className={"link-look"}>
                   <td key={portfolio[s].ticker}>{portfolio[s].ticker}</td></Link>
                 <td key={`${portfolio[s].basis}`}>{portfolio[s].basis}</td>
-                <td key={`${portfolio[s].share_count}asdf`}>{portfolio[s].share_count}</td>
-                <td key={`${portfolio[s].gain_loss}`}>{stocks[s]?.currentPrice.slice(1) - portfolio[s].basis}</td>
+                <td key={`${portfolio[s].share_count}`}>{portfolio[s].share_count}</td>
+                {/* <td key={`${portfolio[s].gain_loss}`}>{stocks[s]?.currentPrice.slice(1) - portfolio[s].basis}</td> */}
               </tr>
             )
           })}
