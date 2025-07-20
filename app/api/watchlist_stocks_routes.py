@@ -8,8 +8,6 @@ from sqlalchemy.orm import query
 # DELETE api/watchlist-stocks/:ticker
 
 
-
-
 watchlist_stocks_routes = Blueprint('watchlist_stocks', __name__)
 
 
@@ -19,7 +17,7 @@ watchlist_stocks_routes = Blueprint('watchlist_stocks', __name__)
 def watchlist():
     watchlist_stocks = WatchlistStocks.query.filter(
         WatchlistStocks.user_id == current_user.id).all()
-    return {'watchlist':[stock.to_dict() for stock in watchlist_stocks]}
+    return {'watchlist': [stock.to_dict() for stock in watchlist_stocks]}
 
 
 @watchlist_stocks_routes.route('/<ticker>', methods=['POST', 'DELETE'])

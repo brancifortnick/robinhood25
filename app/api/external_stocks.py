@@ -1,5 +1,6 @@
 from flask import Blueprint
 import requests
+import os
 
 
 external_stocks = Blueprint('external_stocks', __name__)
@@ -9,14 +10,24 @@ external_stocks = Blueprint('external_stocks', __name__)
 # /api/stocks /: ticker
 
 
+external_stocks = Blueprint('external_stocks', __name__)
+
+# route: /api/stocks/<ticker>
+
+
 @external_stocks.route('/<ticker>')
 def get_single_stock(ticker):
-    httpResponse = requests.get(
-        "https://api.polygon.io/v2/aggs/ticker/" + ticker)
-    pythonData = httpResponse.json()
-    print(f' ticker + {ticker}')
-    return pythonData
-
+    api_key = os.getenv('POLYGON_API_KEY')
+    url = f"https://api.polygon.io/v2/aggs/ticker/{ticker}/prev?adjusted=true&apikey={api_key}"
+    try:
+        httpResponse = requests.get(url)
+        httpResponse.raise_for_status()
+        pythonData = httpResponse.json()
+        print(f'Ticker: {ticker}, Response: {pythonData}')
+        return pythonData
+    except Exception as e:
+        print(f"Error fetching data for {ticker}: {e}")
+        return {"error": str(e)}, 500
 
 # returned object
 # {

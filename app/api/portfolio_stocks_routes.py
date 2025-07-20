@@ -77,7 +77,8 @@ def add_ticker_to_portfolio(ticker, operator):
 
         db.session.add(stock_already_in_portfolio)
         db.session.commit()
-        print(stock_already_in_portfolio.to_dict(), "backend ------<><><><><>")
+        print(stock_already_in_portfolio.to_dict(),
+              "backend ------<><><><><> PORTFOLIO STOCKS!!!!!!!!!!!!!!!!!!")
         return stock_already_in_portfolio.to_dict()
     else:
         if operator == 'subtract':

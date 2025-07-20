@@ -41,14 +41,14 @@ export default function BuyPanel({ ticker }) {
                     <button id='buy' onClick={async () => {
                         await dispatch(updateStock(ticker, "add"));
                         await dispatch(
-                            updateBalance(portfolio[ticker].basis, "subtract")
+                            updateBalance(stocks?.basis, "subtract")
                         );
                     }}>Buy 1</button>
                     <br></br>
                     <button style={{ "background-color": "salmon" }} id='sell' onClick={async () => {
                         await dispatch(updateStock(ticker, "subtract"));
                         await dispatch(
-                            updateBalance(portfolio[ticker].basis, "add")
+                            updateBalance(stocks.basis, "add")
                         );
                     }}>Sell 1</button>
                 </div>

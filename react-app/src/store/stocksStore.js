@@ -14,50 +14,44 @@ const loadOneStock = stock => ({
 export const getSingleStock = (ticker) => async dispatch => {
   try {
     const response = await fetch(`/api/stocks/${ticker}`);
-    console.log(ticker, 'ticker===<> stock store')
     if (response.ok) {
-
       const stock = await response.json();
-      console.log(stock, 'stock from response if ok')
       dispatch(loadOneStock(stock));
     }
   } catch (error) {
-    console.log(error,)
+    console.log(error);
   }
 };
 
 export const getMultipleStocks = (tickersList) => async dispatch => {
   const stocks = [];
-  tickersList.forEach(async ticker => {
+  for (const ticker of tickersList) {
     const response = await fetch(`/api/stocks/${ticker}`);
-
     if (response.ok) {
       const json = await response.json();
       stocks.push(json);
-    };
-  });
+    }
+  }
   dispatch(loadManyStocks(stocks));
 };
 
 const initialState = {};
 
 export default function stockReducer(state = initialState, action) {
-  let newState = {}
   switch (action.type) {
-    case LOAD_MULTIPLE_STOCKS:
-      const multipleStocks = {};
+    case LOAD_MULTIPLE_STOCKS: {
+      const newState = { ...state };
       action.stocks.forEach(stock => {
-        multipleStocks[stock.ticker] = stock;
+        newState[stock.ticker] = stock;
       });
-      return {
-        ...multipleStocks,
-        ...state,
-      };
-    case LOAD_SINGLE_STOCK:
-      newState = Object.assign({}, state);
+      return newState;
+    }
+    case LOAD_SINGLE_STOCK: {
+      const newState = { ...state };
       newState[action.stock.ticker] = action.stock;
       return newState;
+    }
     default:
       return state;
   }
-};
+}

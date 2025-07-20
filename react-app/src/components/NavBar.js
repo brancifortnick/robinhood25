@@ -31,11 +31,12 @@ const NavBar = () => {
         </div>
         <div id='nav-spacer'></div>
         <div className="links_container">
-          <Link to="/" className={"nav-link"}><div className={"nav-link-div"}> Home</div></Link>
-          <Link to="/" className={"nav-link"}><div className={"nav-link-div"}> Portfolio</div></Link>
-          {/* <Link to="/asset/AAPL" className={"nav-link"}><div className={"nav-link-div"}> AAPL</div></Link> */}
-          <Link to="/" className={"nav-link"}><div className={"nav-link-div"}> Account</div></Link>
-          <LogoutButton className={"nav-link"}/>
+          <Link to="/" className='nav-link'><div className="nav-link-div"> Home</div></Link>
+          <Link to="/" className='nav-link'><div className="nav-link-div"> Portfolio</div></Link>
+          <Link to="/asset/AAPL" className='nav-link'><div className="nav-link-div"> AAPL</div></Link>
+          <Link to="/asset/TSLA" className='nav-link'><div className="nav-link-div"> TSLA</div></Link>
+          <Link to="/" className='nav-link'><div className="nav-link-div"> Account</div></Link>
+          <LogoutButton className='nav-link' />
         </div>
 
       </div>

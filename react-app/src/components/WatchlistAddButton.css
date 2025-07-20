@@ -1,6 +1,7 @@
 
 
 .add-button {
+
   background-color: white;
   color: rgb(0, 200, 5);
   border: 1px solid rgb(0, 200, 5);
@@ -9,7 +10,7 @@
   font-weight: 600;
   height: 48px;
   border-radius: 4px;
-  width: 100%
+  padding: 1rem 0;
 }
 
 .add-button:hover {
