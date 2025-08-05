@@ -68,9 +68,10 @@ def add_ticker_to_portfolio(ticker, operator):
             stock_already_in_portfolio.share_count += 1
             new_basis = round((expanded_basis + current_price) /
                               stock_already_in_portfolio.share_count, 2)
+            print(f'hey, {new_basis}')
             stock_already_in_portfolio.basis = new_basis
         else:  # subtract
-            if stock_already_in_portfolio.share_count > 0:
+            if stock_already_in_portfolio.share_count >= 0:
                 stock_already_in_portfolio.share_count -= 1
             else:
                 return {'error': 'Cannot sell - no shares to sell'}, 400

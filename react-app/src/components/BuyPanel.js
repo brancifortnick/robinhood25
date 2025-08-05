@@ -15,8 +15,8 @@ export default function BuyPanel({ ticker }) {
     const user = useSelector(state => state.session.user)
     const portfolio = useSelector(state => state.portfolio)
     const stocks = useSelector(state => state.stocks)
-    console.log(portfolio[ticker], "stocks object so i can query price>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-
+    console.log(portfolio, "portfilio object so i can query price>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+    console.log(portfolio[ticker], "stocks object------------------------")
     let currentPrice = 0
 
     useEffect(() => {
@@ -41,14 +41,14 @@ export default function BuyPanel({ ticker }) {
                     <button id='buy' onClick={async () => {
                         await dispatch(updateStock(ticker, "add"));
                         await dispatch(
-                            updateBalance(stocks?.basis, "subtract")
+                            updateBalance(portfolio[ticker].basis, "subtract")
                         );
                     }}>Buy 1</button>
                     <br></br>
                     <button style={{ "background-color": "salmon" }} id='sell' onClick={async () => {
                         await dispatch(updateStock(ticker, "subtract"));
                         await dispatch(
-                            updateBalance(stocks.basis, "add")
+                            updateBalance(portfolio[ticker].basis, "add")
                         );
                     }}>Sell 1</button>
                 </div>
