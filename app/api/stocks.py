@@ -22,7 +22,7 @@ def get_stock(ticker):
         return {'stock': stock.to_dict()}
     # If not in portfolio, fetch from Polygon.io
     api_key = os.getenv('POLYGON_API_KEY')
-    url = f"https://api.polygon.io/v2/aggs/ticker/{ticker}/prev?adjusted=true&apikey={api_key}"
+    url = f"https://api.polygon.io/v3/reference/tickers/{ticker}/?apiKey={api_key}"
     try:
         response = requests.get(url)
         response.raise_for_status()

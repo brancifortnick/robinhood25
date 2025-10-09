@@ -11,18 +11,19 @@ portfolio_stocks_routes = Blueprint('portfolio_stocks', __name__)
 POLYGON_API_KEY = os.getenv('POLYGON_API_KEY')
 
 
+
 def get_stock_price(ticker):
     try:
         # Get previous close price from Polygon.io
         response = requests.get(
-            f"https://api.polygon.io/v2/aggs/ticker/{ticker}/prev?adjusted=true&apikey={POLYGON_API_KEY}")
+            f"https://api.polygon.io/v3/reference/tickers/{ticker}?apikey={POLYGON_API_KEY}")
         data = response.json()
 
         if data.get('status') == 'OK' and data.get('resultsCount', 0) > 0:
             results = data.get('results', [])
             if results:
                 # 'c' is close price
-                current_price = float(results[0].get('c'))
+                current_price = float(results[0].get('c'), 0)
                 return current_price
 
         return None

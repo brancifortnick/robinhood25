@@ -16,12 +16,17 @@ import Search from './components/Search';
 import SearchResults from './components/SearchResults';
 import Asset from './components/Asset'
 import HomePage from './components/HomePage';
+import WatchlistAddButton from './components/WatchlistAddButton';
 
 function App() {
   const [loaded, setLoaded] = useState(false);
   const user = useSelector(state => state.session.user)
   const dispatch = useDispatch();
 
+  const stocks = useSelector(state => Object.values(state.stocks));
+  console.log(stocks, "stocks in appjs-----------------")
+  const watchlist = useSelector(state => state.watchlist)
+  console.log(watchlist, 'watchlist from useSelector00000000000000000000000000000000000000000000000000');
   useEffect(() => {
     (async () => {
       await dispatch(authenticate());
@@ -36,12 +41,28 @@ function App() {
   return (
     <BrowserRouter>
       <Switch>
+
         <Route path="/login" exact={true}>
           <LoginForm />
         </Route>
         <Route path="/sign-up" exact={true}>
           <SignUpForm />
         </Route>
+        <ProtectedRoute path="/stocks/:ticker" exact={true}>
+          <NavBar />
+          <Stock />
+        </ProtectedRoute>
+
+        <ProtectedRoute path="/watchlist" exact={true}>
+          <NavBar />
+          <WatchlistAddButton ticker={''} />
+          <Watchlist />
+        </ProtectedRoute>
+
+        <ProtectedRoute path="/users/:userId" exact={true}>
+          <NavBar />
+          <User />
+        </ProtectedRoute>
         <ProtectedRoute path="/users" exact={true}>
           <UsersList />
         </ProtectedRoute>

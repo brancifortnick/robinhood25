@@ -1,0 +1,9 @@
+import { createReadStream } from "fs"
+
+const addNums = (minus, plus, pusher) => {
+    
+    let cards = []
+
+    for (let i = 0; i <= cards.length; i++) {
+    if(
+}

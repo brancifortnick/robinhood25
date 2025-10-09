@@ -8,8 +8,8 @@ import portfolio from './portfolioStore'
 const rootReducer = combineReducers({
   session,
   stocks,
-  watchlist,
   portfolio,
+  watchlist,
 });
 
 

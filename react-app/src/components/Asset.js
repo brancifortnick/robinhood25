@@ -13,7 +13,7 @@ export default function Asset() {
     ticker = ticker.toUpperCase()
 
     const dispatch = useDispatch();
-    const stock = useSelector(state => state.stocks[ticker])
+    const stock = useSelector(state => state.stocks)
     const user = useSelector(state => state.session.user)
 
     useEffect(() => {
@@ -41,7 +41,7 @@ export default function Asset() {
                 <div className={"about"}>
                     <div><p>Top Holder</p><span>{stock?.holder0}</span></div>
                     {/* <div><p>Headquarters</p><span>{stock?.address.slice(0, 11)}</span></div> */}
-                    <div><p>YTD Price</p><span>{stock?.percentTextYear}</span></div>
+                    <div><p>YTD Price</p><span>{stock?.results?.description}</span></div>
                     <div><p>Analyst Score</p><span>{stock?.tradeWords}</span></div>
                 </div>
                 <div className="titles">Key Statistics</div >

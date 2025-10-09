@@ -9,7 +9,7 @@ import "./Watchlist.css";
 function Watchlist() {
   const stocks = useSelector((state) => state.stocks);
   const watchlist = useSelector((state) => state.watchlist);
-
+console.log(watchlist, 'watchlist from useSelector00000000000000000000000000000000000000000000000000');
 
   console.log(watchlist, 'watchlist object000000000000000000000000000000000000000000000000000')
   const dispatch = useDispatch();
@@ -21,6 +21,7 @@ function Watchlist() {
   useEffect(() => {
     const watchlistValuesArray = Object.values(watchlist);
     if (watchlistValuesArray) {
+      console.log(watchlistValuesArray, 'watchlistValuesArray from useEffect00000000000000000000000000000000000000000000000000')
       for (const stock of watchlistValuesArray) {
         dispatch(getSingleStock(stock.ticker));
       }
@@ -51,7 +52,7 @@ function Watchlist() {
               </div>
 
               <div className="current-price">
-                {stocks[watchedStock.ticker]?.currentPrice}
+                {stocks[watchedStock.ticker]?.basis}
               </div>
 
               <button
