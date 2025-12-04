@@ -1,12 +1,10 @@
-* {
-  margin: 0;
-  font-family: "Capsule Sans Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  font-size: 18px;
-}
+/* Robinhood Login Form Styling */
 
 .loginform-container {
   display: flex;
   flex-direction: row;
+  height: 100vh;
+  background-color: var(--rh-white);
 }
 
 .loginform-image {
@@ -16,86 +14,118 @@
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  max-height: 1100px;
+  background: linear-gradient(135deg, #00C805 0%, #00A004 100%);
 }
 
 .loginform-image img {
   flex-shrink: 0;
   min-width: 100%;
   min-height: 100%;
+  object-fit: cover;
+  opacity: 0.9;
 }
 
 .loginform {
   height: 100vh;
-  position: relative;
   width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--rh-white);
 }
 
 .login {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  position: relative;
-  margin: auto 50px;
-  height: 100%;
-  width: 50%;
+  width: 100%;
+  max-width: 400px;
+  padding: var(--spacing-3xl);
 }
 
 .welcome-title {
-  margin: 0;
-  font-size: 21px;
+  font-size: 32px;
   font-weight: 500;
+  letter-spacing: -0.5px;
+  margin-bottom: var(--spacing-3xl);
+  color: var(--rh-black);
 }
 
 .input-and-label {
-  height: 60px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  margin: 10px 0;
+  margin-bottom: var(--spacing-xl);
 }
 
 .input-and-label label {
   font-size: 13px;
-  font-weight: 400;
+  font-weight: 500;
+  color: var(--rh-gray-800);
+  display: block;
+  margin-bottom: var(--spacing-sm);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 
 .input-and-label input {
-  height: 33px;
-  border-radius: 3px;
-  border: 1px solid lightgray;
+  width: 100%;
+  height: 56px;
+  padding: 0 var(--spacing-lg);
+  font-size: 17px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rh-gray-300);
+  background-color: var(--rh-gray-100);
+  transition: all 0.2s ease;
+  color: var(--rh-black);
+}
+
+.input-and-label input::placeholder {
+  color: var(--rh-gray-600);
 }
 
 .input-and-label input:hover {
-  border: 1px solid grey;
-  border-radius: 5px;
-  outline: none;
+  border-color: var(--rh-gray-500);
+  background-color: var(--rh-white);
 }
 
 .input-and-label input:focus {
-  z-index: -1;
-  border: 1px solid rgb(0, 200, 5);
-  border-radius: 5px;
+  border-color: var(--rh-black);
+  background-color: var(--rh-white);
   outline: none;
+  box-shadow: var(--shadow-sm);
 }
 
 .signin-button {
-  color: white;
-  margin-top: 100px;
-  height: 50px;
-  width: 145px;
-  background-color: rgb(0, 200, 5);
-  border: 1px solid rgb(0, 200, 5);
-  border-radius: 5px;
+  color: var(--rh-white);
+  margin-top: var(--spacing-2xl);
+  height: 56px;
+  width: 100%;
+  background-color: var(--rh-green);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .signin-button:hover {
-  background-color: rgba(0, 160, 4, 1);
-  border: 1px solid rgba(0, 160, 4, 1);
-  cursor: pointer;
+  background-color: var(--rh-green-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.signin-button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
 }
 
 .errors p {
   font-size: 13px;
-  font-weight: 700;
+  font-weight: 500;
+  color: var(--rh-red);
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background-color: var(--rh-red-light);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--rh-red);
 }
+

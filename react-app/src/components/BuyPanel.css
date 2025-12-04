@@ -1,91 +1,140 @@
-* {
-    box-sizing: border-box;
-    font-family: "Capsule Sans Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    margin: 0px;
-    padding: 0px;
-    font-size: 15px;
-}
+/* Robinhood Buy Panel Styling */
 
 #buy-panel {
-    box-sizing: border-box;
-    /* max-width: 500px; */
-    max-height: 367px;
-    /* position: absolute; */
-    box-shadow: rgba(0, 0, 0, 0.02) 0px -12px 24px 0px, rgba(0, 0, 0, 0.06) 0px 12px 24px 0px, rgba(0, 0, 0, 0.02) 0px -12px 24px, rgba(0, 0, 0, 0.02) 0px 12px 24px;
-    border-radius: 4px;
-    border: 1px solid rgb(227, 233, 237);
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 380px;
+  background-color: var(--rh-white);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--rh-gray-200);
+  overflow: hidden;
 }
 
 #buy-1 {
-    font-size: 15px;
-    font-weight: 700;
-    padding: 0 24px;
-    height: 52px;
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid rgb(227, 233, 237);
+  font-size: 17px;
+  font-weight: 600;
+  padding: 0 var(--spacing-xl);
+  height: 64px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--rh-gray-200);
+  background-color: var(--rh-white);
+  color: var(--rh-black);
 }
 
 #buy-2 {
-    padding: 24px 24px;
-    display: flex;
-    justify-content: space-between;
+  padding: var(--spacing-xl);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #buy-2 span {
-    font-weight: 700;
-    line-height: 20px;
-    font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  font-size: 15px;
+  color: var(--rh-gray-800);
 }
 
 #buy-3 {
-    min-height: 108px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 12px 24px 24px 24px;
-    /* background-color: powderblue; */
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--spacing-md) var(--spacing-xl) var(--spacing-xl);
 }
 
 #buy, #sell {
-    background-color: rgb(0, 200, 5);
-    border: 0;
-    outline: 0;
-    color: white;
-    font-size: 13px;
-    font-weight: 400;
-    height: 48px;
-    border-radius: 4px;
+  background-color: var(--rh-green);
+  border: none;
+  color: var(--rh-white);
+  font-size: 15px;
+  font-weight: 600;
+  height: 56px;
+  border-radius: var(--radius-md);
+  width: 100%;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+#buy:hover, #sell:hover {
+  background-color: var(--rh-green-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+#buy:active, #sell:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+#sell {
+  background-color: var(--rh-black);
+}
+
+#sell:hover {
+  background-color: var(--rh-gray-900);
 }
 
 #watchlist-wrapper {
-    display: flex;
-    justify-content: space-around;
-    flex-direction: column;
-    padding: 12px 24px 24px 24px;
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+  padding: var(--spacing-md) var(--spacing-xl) var(--spacing-xl);
 }
 
 #watchlist {
-    background-color: white;
-    color: rgb(0, 200, 5);
-    border: 1px solid rgb(0, 200, 5);
-    outline: 0;
-    font-size: 13px;
-    font-weight: 600;
-    height: 48px;
-    border-radius: 4px;
-    width: 100%
+  background-color: var(--rh-white);
+  color: var(--rh-green);
+  border: 2px solid var(--rh-green);
+  font-size: 15px;
+  font-weight: 600;
+  height: 56px;
+  border-radius: var(--radius-md);
+  width: 100%;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+#watchlist:hover {
+  background-color: var(--rh-green-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+#watchlist:active {
+  transform: translateY(0);
 }
 
 #buy-4 {
-    font-size: 13px;
-    color: rgb(0, 200, 5);
-    font-weight: 400;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    line-height: 20px;
-    min-height: 48px;
-    border-top: 1px solid rgb(227, 233, 237);
-    padding: 0 2rem;
+  font-size: 13px;
+  color: var(--rh-gray-700);
+  font-weight: 400;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 1.5;
+  min-height: 56px;
+  border-top: 1px solid var(--rh-gray-200);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  text-align: center;
+}
+
+/* Input Styling for Buy Panel */
+#buy-panel input {
+  width: 100%;
+  padding: var(--spacing-md);
+  font-size: 17px;
+  border: 1px solid var(--rh-gray-300);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--spacing-md);
+  background-color: var(--rh-gray-100);
+  transition: all 0.2s ease;
+}
+
+#buy-panel input:focus {
+  background-color: var(--rh-white);
+  border-color: var(--rh-black);
+  box-shadow: var(--shadow-sm);
 }

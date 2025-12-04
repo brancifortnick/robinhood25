@@ -33,43 +33,63 @@ console.log(watchlist, 'watchlist from useSelector000000000000000000000000000000
   return (
     <div className="add-to-watchlist-container">
       <div id='watchlist-title'>Watchlist</div>
-      {watchlist ? (
+      {watchlist && Object.keys(watchlist).length > 0 ? (
         Object.values(watchlist).map((watchedStock) => {
+          const stockData = stocks[watchedStock.ticker];
           return (
-            <div className="watchlist-components">
+            <Link 
+              to={`/asset/${watchedStock.ticker}`} 
+              key={watchedStock.ticker}
+              className="link-look"
+              style={{width: '100%', textDecoration: 'none', color: 'inherit'}}
+            >
+              <div className="watchlist-components">
+                <div className="watchlist-stock-info">
+                  {stockData?.logoUrl && (
+                    <img 
+                      src={stockData.logoUrl}
+                      alt={`${watchedStock.ticker} logo`}
+                      className="stock-logo"
+                      onError={(e) => {
+                        if (stockData?.logoFallback) {
+                          e.target.src = stockData.logoFallback;
+                        }
+                      }}
+                    />
+                  )}
+                  <div className="ticker-info">
+                    <div className="ticker-name">{watchedStock.ticker}</div>
+                    <div className="company-name">{stockData?.shortName || 'Loading...'}</div>
+                  </div>
+                </div>
+                
+                <div className="price-info">
+                  <div className="current-price">
+                    ${stockData?.currentPrice?.toFixed(2) || '---'}
+                  </div>
+                  <div className={`percent-change ${stockData?.percentText?.startsWith('+') ? 'positive' : 'negative'}`}>
+                    {stockData?.percentText || '---'}
+                  </div>
+                </div>
 
-
-              <Link to={`/asset/${watchedStock.ticker}`} className="link-look">
-                <div className="ticker-name">{watchedStock.ticker}</div>
-              </Link>
-              <div
-                className="stock-logo"
-                style={{
-                  backgroundImage: `url('${stocks[watchedStock.ticker]?.logo_url
-                    }')`,
-                }} >
-
+                <button
+                  className="delete-button"
+                  onClick={async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    await dispatch(deleteTickerThunk(watchedStock.ticker));
+                    await dispatch(getAllInWatchList());
+                  }}>
+                  ×
+                </button>
               </div>
-
-              <div className="current-price">
-                {stocks[watchedStock.ticker]?.basis}
-              </div>
-
-              <button
-                className="delete-button"
-                onClick={async () => {
-                  await dispatch(deleteTickerThunk(watchedStock.ticker));
-                  await dispatch(getAllInWatchList());
-                }}>
-                -
-              </button>
-            </div >
+            </Link>
           );
         })
-
-
       ) : (
-        <div>Loading...</div>
+        <div style={{padding: '20px', textAlign: 'center', color: '#666'}}>
+          No stocks in watchlist
+        </div>
       )}
     </div >
   );

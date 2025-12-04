@@ -4,8 +4,98 @@ import requests
 from flask_login import login_required, current_user
 from app.models import db, PortfolioStocks
 import traceback
+from datetime import datetime, timedelta
 
 stocks = Blueprint('stocks', __name__)
+
+
+def get_stock_logo_url(ticker, company_name=None):
+    """
+    Get logo URL for a stock ticker
+    Uses multiple sources with fallbacks
+    """
+    ticker_upper = ticker.upper()
+    
+    # Map of known tickers to their domains for Clearbit
+    ticker_domain_map = {
+        'AAPL': 'apple.com',
+        'MSFT': 'microsoft.com',
+        'GOOGL': 'google.com',
+        'GOOG': 'google.com',
+        'AMZN': 'amazon.com',
+        'TSLA': 'tesla.com',
+        'META': 'meta.com',
+        'FB': 'meta.com',
+        'NVDA': 'nvidia.com',
+        'JPM': 'jpmorganchase.com',
+        'V': 'visa.com',
+        'WMT': 'walmart.com',
+        'DIS': 'disney.com',
+        'MA': 'mastercard.com',
+        'NFLX': 'netflix.com',
+        'AMD': 'amd.com',
+        'INTC': 'intel.com',
+        'PYPL': 'paypal.com',
+        'ADBE': 'adobe.com',
+        'CRM': 'salesforce.com',
+        'ORCL': 'oracle.com',
+        'IBM': 'ibm.com',
+        'CSCO': 'cisco.com',
+        'BAC': 'bankofamerica.com',
+        'KO': 'coca-cola.com',
+        'PEP': 'pepsi.com',
+        'NKE': 'nike.com',
+        'MCD': 'mcdonalds.com',
+        'T': 'att.com',
+        'VZ': 'verizon.com',
+    }
+    
+    # Get the domain for Clearbit
+    domain = ticker_domain_map.get(ticker_upper, f"{ticker.lower()}.com")
+    
+    return {
+        'primary': f"https://logo.clearbit.com/{domain}",
+        'fallback': f"https://ui-avatars.com/api/?name={ticker_upper}&size=128&background=0066CC&color=fff&bold=true"
+    }
+
+
+def fetch_intraday_data(ticker, api_key):
+    """Fetch intraday (5min) data for daily chart"""
+    try:
+        url = f"https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol={ticker}&interval=5min&apikey={api_key}"
+        response = requests.get(url, timeout=10)
+        data = response.json()
+        
+        if 'Time Series (5min)' in data:
+            time_series = data['Time Series (5min)']
+            # Get last 20 data points for daily chart
+            prices = []
+            for timestamp in sorted(time_series.keys(), reverse=True)[:20]:
+                prices.append(float(time_series[timestamp]['4. close']))
+            return list(reversed(prices))  # Reverse to show chronologically
+        return None
+    except:
+        return None
+
+
+def fetch_daily_data(ticker, api_key, days=30):
+    """Fetch daily data for weekly/monthly charts"""
+    try:
+        url = f"https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey={api_key}"
+        response = requests.get(url, timeout=10)
+        data = response.json()
+        
+        if 'Time Series (Daily)' in data:
+            time_series = data['Time Series (Daily)']
+            # Get last N days
+            prices = []
+            for timestamp in sorted(time_series.keys(), reverse=True)[:days]:
+                prices.append(float(time_series[timestamp]['4. close']))
+            return list(reversed(prices))  # Reverse to show chronologically
+        return None
+    except:
+        return None
+
 
 @stocks.route('/<ticker>')
 @login_required
@@ -16,29 +106,37 @@ def get_stock(ticker):
         
         print(f"Processing request for ticker: {ticker}")
         
+        # Get logo URLs
+        logo_urls = get_stock_logo_url(ticker)
+        
         # Initialize with default data that will always work
         stock_data = {
             'ticker': ticker,
             'shortName': ticker,
+            'companyName': ticker,
             'description': f'Stock information for {ticker}',
             'currentPrice': 100.00,
+            'price': 100.00,  # Alias for compatibility
+            'percentChange': 2.50,  # Numeric value
             'percentText': '+2.50%',
             'address': 'N/A',
             'marketCap': 1000000000,
             'homepage_url': '',
+            'logoUrl': logo_urls['primary'],
+            'logoFallback': logo_urls['fallback'],
             'inPortfolio': False,
             'shares': 0,
             'basis': 0,
-            'dailyPrices': [98, 100, 102, 101, 103],
-            'dailyPricesLabels': ['9AM', '10AM', '11AM', '12PM', '1PM'],
-            'weeklyPrices': [95, 100, 103, 108, 106],
-            'weeklyPricesLabels': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
-            'oneMonthPrices': [90, 95, 100, 105, 110],
-            'oneMonthPricesLabels': ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-            'yearlyPrices': [80, 90, 100, 110, 120],
-            'yearlyPricesLabels': ['Q1', 'Q2', 'Q3', 'Q4'],
-            'allTimePrices': [50, 70, 90, 100, 120],
-            'allTimePricesLabels': ['2020', '2021', '2022', '2023', '2024']
+            'dailyPrices': [98, 100, 102, 101, 103, 104, 103, 105, 106, 108],
+            'dailyPricesLabels': ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM'],
+            'weeklyPrices': [95, 97, 100, 103, 105, 108, 106],
+            'weeklyPricesLabels': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            'oneMonthPrices': [90, 93, 95, 98, 100, 103, 105, 108, 110, 112],
+            'oneMonthPricesLabels': ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8', 'Week 9', 'Week 10'],
+            'yearlyPrices': [80, 85, 90, 95, 100, 105, 110, 115, 120, 125],
+            'yearlyPricesLabels': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+            'allTimePrices': [50, 60, 70, 80, 90, 100, 110, 120, 130, 140],
+            'allTimePricesLabels': ['2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029']
         }
         
         # Try to get portfolio data
@@ -68,9 +166,11 @@ def get_stock(ticker):
                 
                 if company_response.status_code == 200:
                     company_json = company_response.json()
-                    if 'Symbol' in company_json:
+                    if 'Symbol' in company_json and 'Note' not in company_json:
+                        company_name = company_json.get('Name', ticker)
                         stock_data.update({
-                            'shortName': company_json.get('Name', ticker),
+                            'shortName': company_name,
+                            'companyName': company_name,
                             'description': company_json.get('Description', f'Stock information for {ticker}'),
                             'marketCap': int(company_json.get('MarketCapitalization', 1000000000)) if company_json.get('MarketCapitalization') else 1000000000,
                             'homepage_url': '',
@@ -85,7 +185,7 @@ def get_stock(ticker):
                 if price_response.status_code == 200:
                     price_json = price_response.json()
                     global_quote = price_json.get('Global Quote', {})
-                    if global_quote:
+                    if global_quote and 'Note' not in price_json:
                         current_price = float(global_quote.get('05. price', 100))
                         prev_close = float(global_quote.get('08. previous close', 100))
                         
@@ -93,9 +193,32 @@ def get_stock(ticker):
                             percent_change = ((current_price - prev_close) / prev_close) * 100
                             stock_data.update({
                                 'currentPrice': current_price,
+                                'price': current_price,  # Alias for compatibility
+                                'percentChange': percent_change,  # Numeric value
                                 'percentText': f"{percent_change:+.2f}%"
                             })
                             print(f"Updated with price data for {ticker}: ${current_price}")
+                
+                # Fetch chart data (intraday for daily view)
+                print(f"Fetching chart data for {ticker}...")
+                daily_data = fetch_intraday_data(ticker, api_key)
+                if daily_data and len(daily_data) > 5:
+                    stock_data['dailyPrices'] = daily_data
+                    print(f"✅ Fetched {len(daily_data)} intraday prices")
+                
+                # Fetch weekly/monthly data (daily time series)
+                daily_time_series = fetch_daily_data(ticker, api_key, days=30)
+                if daily_time_series and len(daily_time_series) >= 7:
+                    # Weekly: last 7 days
+                    stock_data['weeklyPrices'] = daily_time_series[-7:]
+                    # Monthly: last 30 days
+                    stock_data['oneMonthPrices'] = daily_time_series
+                    # Yearly/All-time: use monthly data sampled
+                    if len(daily_time_series) >= 12:
+                        # Sample every ~3 days for yearly view
+                        stock_data['yearlyPrices'] = daily_time_series[::3][:10]
+                        stock_data['allTimePrices'] = daily_time_series[::3][:10]
+                    print(f"✅ Fetched daily time series data")
                 
             except requests.RequestException as api_error:
                 print(f"API request failed for {ticker}: {api_error}")

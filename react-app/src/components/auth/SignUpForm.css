@@ -1,100 +1,178 @@
+/* Robinhood Sign Up Form Styling */
+
 .signupcontainer {
   display: flex;
+  height: 100vh;
+  background-color: var(--rh-white);
 }
 
 .signupcontainerleft {
-  padding-left: 117px;
   width: 60%;
   height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-3xl);
 }
 
 .signupcontainerright {
-  background-color: #edfdff;
+  background: linear-gradient(135deg, #E8F9F0 0%, #D4F3E5 100%);
   width: 40%;
   height: 100vh;
-  padding-left: 80px;
+  padding: var(--spacing-3xl);
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: center;
+  gap: var(--spacing-3xl);
 }
 
 .content-block {
-  width: 266px;
+  max-width: 360px;
+  padding: var(--spacing-xl);
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(10px);
 }
 
-.content-block-body,
 .content-block-header {
-  font-size: 15px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--rh-black);
+  margin-bottom: var(--spacing-md);
+  letter-spacing: -0.3px;
 }
 
-.footer-text  > p {
-  width: 50%;
-  font-size: 12.75px;
-  color: lightgray;
-  line-height: normal;
-  margin-bottom: 15px;
+.content-block-body {
+  font-size: 15px;
+  color: var(--rh-gray-800);
+  line-height: 1.6;
+}
+
+.footer-text > p {
+  font-size: 13px;
+  color: var(--rh-gray-600);
+  line-height: 1.5;
+  margin-bottom: var(--spacing-lg);
 }
 
 .signuptitle > h1 {
-  margin-top: 36px;
-  margin-bottom: 80px;
-  font-size: 24px;
-  font-weight: 600;
+  margin-top: var(--spacing-2xl);
+  margin-bottom: var(--spacing-3xl);
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.5px;
+  color: var(--rh-black);
 }
 
-.formbuttonssignup {
-  display: flex;
-  height: 48px;
-  margin-bottom: 50px;
-}
-
-.formbuttonssignup > button {
-  width: 150px;
-  font-size: 13px;
-  background-color: limegreen;
-  border-radius: 5px;
-  border: none;
-  color: white;
-}
-
-.formbuttonssignup > button:hover {
-  background-color: rgb(1, 185, 7);
-}
-
-.formlinklogin > p,
-.formlinklogin > a {
-  width: 208px;
-  font-size: 13px;
-  line-height: normal;
-  margin-left: 5px;
-  text-decoration: none;
-}
-
-.formlinklogin > a {
-  color: limegreen;
+.formstuff {
+  width: 100%;
+  max-width: 500px;
 }
 
 .formstuff > p {
   font-size: 13px;
+  font-weight: 500;
+  color: var(--rh-gray-800);
+  margin-bottom: var(--spacing-sm);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.inputfields {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
 }
 
 .inputfield > input {
-  background-color: #edfdff;
   width: 100%;
-  padding: 5px 12px;
-  border-radius: 5px;
-  border: 1px solid lightgray;
+  height: 56px;
+  padding: 0 var(--spacing-lg);
+  font-size: 17px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rh-gray-300);
+  background-color: var(--rh-gray-100);
+  transition: all 0.2s ease;
+  color: var(--rh-black);
+}
+
+.inputfield > input::placeholder {
+  color: var(--rh-gray-600);
+}
+
+.inputfield > input:hover {
+  border-color: var(--rh-gray-500);
+  background-color: var(--rh-white);
+}
+
+.inputfield > input:focus {
+  border-color: var(--rh-black);
+  background-color: var(--rh-white);
+  outline: none;
+  box-shadow: var(--shadow-sm);
 }
 
 .usernameandemaildiv {
   display: flex;
+  gap: var(--spacing-lg);
 }
 
-.inputfields {
-  width: 80%;
+.usernameandemaildiv .inputfield {
+  flex: 1;
+}
+
+.formbuttonssignup {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 150px;
-  margin-bottom: 10px;
+  height: 56px;
+  margin-bottom: var(--spacing-3xl);
+}
+
+.formbuttonssignup > button {
+  width: 100%;
+  font-size: 17px;
+  font-weight: 600;
+  background-color: var(--rh-green);
+  border-radius: var(--radius-md);
+  border: none;
+  color: var(--rh-white);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.formbuttonssignup > button:hover {
+  background-color: var(--rh-green-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.formbuttonssignup > button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+.formlinklogin {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-xl);
+}
+
+.formlinklogin > p {
+  font-size: 15px;
+  color: var(--rh-gray-700);
+}
+
+.formlinklogin > a {
+  font-size: 15px;
+  color: var(--rh-green);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.formlinklogin > a:hover {
+  color: var(--rh-green-dark);
+  text-decoration: underline;
 }

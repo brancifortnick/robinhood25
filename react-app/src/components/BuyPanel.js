@@ -15,21 +15,45 @@ export default function BuyPanel({ ticker }) {
     const user = useSelector(state => state.session.user)
     const portfolio = useSelector(state => state.portfolio)
     const stocks = useSelector(state => state.stocks)
-    console.log(portfolio, "portfilio object so i can query price>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    console.log(portfolio, "stocks object------------------------")
+    const [currentPrice, setCurrentPrice] = useState(null);
+    const [loading, setLoading] = useState(true);
     
     useEffect(() => {
         dispatch(getPortfolio())
-    }, [dispatch])
+        dispatch(getSingleStock(ticker))
+    }, [dispatch, ticker])
+
+    // Fetch current stock price
+    useEffect(() => {
+        const fetchPrice = async () => {
+            try {
+                const response = await fetch(`/api/stocks/${ticker}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setCurrentPrice(data.currentPrice || data.price || 0);
+                }
+            } catch (error) {
+                console.error('Error fetching stock price:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchPrice();
+    }, [ticker]);
 
     // Safety checks
     if (!user) {
         return <div>Loading user data...</div>
     }
 
+    if (loading) {
+        return <div id="buy-panel"><div id="buy-1">Loading...</div></div>
+    }
+
     const stockData = portfolio?.[ticker]
     const shareCount = stockData?.share_count || 0
     const cashBalance = user?.cash_balance || 0
+    const stockPrice = currentPrice || stockData?.basis || 0
 
     return (
         <>
@@ -39,38 +63,37 @@ export default function BuyPanel({ ticker }) {
                 <div id="buy-1">Buy {ticker} </div>
 
                 <div id="buy-2">
-                    <span>Cur. Quantity</span>
+                    <span>Shares Owned</span>
                     <span>{shareCount}</span>
+                </div>
+
+                <div id="buy-2">
+                    <span>Market Price</span>
+                    <span>${stockPrice.toFixed(2)}</span>
                 </div>
 
             <div id="buy-3">
                 <button id='buy' onClick={async () => {
-                    if (!stockData?.basis) {
-                        console.error('Portfolio data not available for', ticker);
-                        alert('Unable to complete purchase. Please try again.');
+                    if (!stockPrice || stockPrice <= 0) {
+                        alert('Unable to fetch current stock price. Please try again.');
+                        return;
+                    }
+                    if (cashBalance < stockPrice) {
+                        alert(`Insufficient funds. You need $${stockPrice.toFixed(2)} but only have $${cashBalance.toFixed(2)}`);
                         return;
                     }
                     await dispatch(updateStock(ticker, "add"));
-                    await dispatch(
-                        updateBalance(stockData.basis, "subtract")
-                    );
-                }}>Buy 1</button>
+                    await dispatch(getPortfolio());
+                }}>Buy 1 Share</button>
                 <br></br>
-                <button style={{ "background-color": "salmon" }} id='sell' onClick={async () => {
-                    if (!stockData?.basis) {
-                        console.error('Portfolio data not available for', ticker);
-                        alert('Unable to complete sale. Please try again.');
-                        return;
-                    }
+                <button id='sell' onClick={async () => {
                     if (shareCount <= 0) {
                         alert('You do not own any shares of this stock.');
                         return;
                     }
                     await dispatch(updateStock(ticker, "subtract"));
-                    await dispatch(
-                        updateBalance(stockData.basis, "add")
-                    );
-                }}>Sell 1</button>
+                    await dispatch(getPortfolio());
+                }}>Sell 1 Share</button>
             </div>
                 <div id="buy-4">
                     ${cashBalance.toFixed(2)} buying power available

@@ -1,16 +1,41 @@
+/* Robinhood Logout Button */
+
 .logout_button {
-    display: flex;
-    align-items: center;
-    background-color: white;
-    border: 0;
-    outline: 0;
-    height: 100%;
-    font-size: inherit;
-    font-weight: inherit;
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  border: none;
+  height: 48px;
+  padding: 0 var(--spacing-lg);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--rh-black);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+  position: relative;
 }
 
 .logout_button:hover {
-    border-bottom: 2px solid rgb(0,200,5);
+  background-color: var(--rh-gray-100);
 }
+
+.logout_button::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: calc(100% - var(--spacing-xl) * 2);
+  height: 3px;
+  background-color: var(--rh-green);
+  border-radius: var(--radius-full);
+  transition: transform 0.2s ease;
+}
+
+.logout_button:hover::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
 
 

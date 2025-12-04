@@ -1,15 +1,65 @@
-.ticker-container-inner{
-    display:flex;
-    flex-direction: flex-start;
-    width:100%;
+/* Robinhood Portfolio Styling */
+
+.ticker-container-inner {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: var(--rh-white);
 }
 
-.ticker-container-inner table{
-    width:100%;
-    font-size: 14px;
+.ticker-container-inner table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
-td{
-    font-size:15px;
-    height:30px;
+.ticker-container-inner th {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--rh-gray-700);
+  text-align: left;
+  padding: var(--spacing-lg) var(--spacing-md);
+  border-bottom: 1px solid var(--rh-gray-200);
+  background-color: var(--rh-gray-100);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
+
+.ticker-container-inner td {
+  font-size: 15px;
+  padding: var(--spacing-lg) var(--spacing-md);
+  border-bottom: 1px solid var(--rh-gray-200);
+  color: var(--rh-black);
+  vertical-align: middle;
+}
+
+.ticker-container-inner tr {
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.ticker-container-inner tr:hover {
+  background-color: var(--rh-gray-100);
+}
+
+.ticker-container-inner tr:last-child td {
+  border-bottom: none;
+}
+
+/* Stock Symbol Styling */
+.ticker-container-inner td:first-child {
+  font-weight: 600;
+  color: var(--rh-black);
+}
+
+/* Positive/Negative Values */
+.positive {
+  color: var(--rh-green);
+  font-weight: 500;
+}
+
+.negative {
+  color: var(--rh-red);
+  font-weight: 500;
+}
+

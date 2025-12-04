@@ -1,18 +1,25 @@
-
+/* Robinhood Add to Watchlist Button */
 
 .add-button {
-
-  background-color: white;
-  color: rgb(0, 200, 5);
-  border: 1px solid rgb(0, 200, 5);
-  outline: 0;
-  font-size: 13px;
+  background-color: var(--rh-white);
+  color: var(--rh-green);
+  border: 2px solid var(--rh-green);
+  font-size: 15px;
   font-weight: 600;
-  height: 48px;
-  border-radius: 4px;
-  padding: 1rem 0;
+  height: 56px;
+  border-radius: var(--radius-md);
+  padding: 0 var(--spacing-xl);
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .add-button:hover {
-  background: black;
+  background-color: var(--rh-green-light);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
+
+.add-button:active {
+  transform: translateY(0);
+}
+

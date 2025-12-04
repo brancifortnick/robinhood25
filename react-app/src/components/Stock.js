@@ -9,20 +9,34 @@ import './Stock.css'
 
 function Stock({ ticker }) {
   const [timePeriod, setTimePeriod] = useState('dailyPrices')
-  const [data, setData] = useState({})
+  const [data, setData] = useState({
+    labels: [],
+    datasets: []
+  })
   const stocks = useSelector(state => state.stocks);
   const dispatch = useDispatch();
+  
   const options = {
     maintainAspectRatio: false,
-    scales: {
-      yAxes: [
-        {
-          ticks: {
-            beginAtZero: false,
-          },
-        },
-      ],
+    plugins: {
+      legend: {
+        display: false
+      }
     },
+    scales: {
+      x: {
+        display: false,
+        grid: {
+          display: false
+        }
+      },
+      y: {
+        display: false,
+        grid: {
+          display: false
+        }
+      }
+    }
   };
 
   useEffect(() => {
@@ -32,43 +46,65 @@ function Stock({ ticker }) {
   }, [dispatch, ticker])
 
   useEffect(() => {
-    if (stocks[ticker]) {
+    if (stocks[ticker] && stocks[ticker][timePeriod] && Array.isArray(stocks[ticker][timePeriod])) {
+      const priceData = stocks[ticker][timePeriod];
+      // Generate labels based on data length
+      const labels = priceData.map((_, index) => index + 1);
+      
       setData({
-        labels: stocks[ticker][timePeriod],
+        labels: labels,
         datasets: [
           {
             label: ticker,
-            data: stocks[ticker][timePeriod],
+            data: priceData,
             fill: false,
-            backgroundColor: 'rgb(255, 99, 132)',
-            borderColor: 'rgba(255, 99, 132, 0.2)',
-            // hoverBorderWidth:8,
-            // showLine: false,
-            scales: {
-              xAxes: [{
-                display: false,
-                gridLines: { color: "#000000" }
-              }],
-              yAxes: [{ display: false, gridLines: { color: "#000000" } }]
-            }
+            backgroundColor: 'rgb(0, 200, 5)',
+            borderColor: 'rgba(0, 200, 5, 0.8)',
+            borderWidth: 2,
+            pointRadius: 0,
+            pointHoverRadius: 4,
+            tension: 0.1
           },
         ],
       })
     }
-  }, [timePeriod, stocks])
+  }, [timePeriod, stocks, ticker])
 
   return (
 
     <div className="graphContainer">
       <div className={"stockstuff2"}>
-        <div id="stock_name">{stocks[ticker]?.shortName}</div>
-        <div id="stock-price-spacer">
-          <span id="stock_price">{stocks[ticker]?.currentPrice}</span>
-          <span id="stock_percent">{stocks[ticker]?.percentText}</span>
+        {stocks[ticker]?.logoUrl && (
+          <img 
+            src={stocks[ticker].logoUrl} 
+            alt={`${ticker} logo`}
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '8px',
+              marginRight: '12px',
+              objectFit: 'contain',
+              background: 'white',
+              padding: '4px'
+            }}
+            onError={(e) => {
+              // Fallback to the backup logo if primary fails
+              if (stocks[ticker]?.logoFallback) {
+                e.target.src = stocks[ticker].logoFallback;
+              }
+            }}
+          />
+        )}
+        <div>
+          <div id="stock_name">{stocks[ticker]?.shortName}</div>
+          <div id="stock-price-spacer">
+            <span id="stock_price">${stocks[ticker]?.currentPrice}</span>
+            <span id="stock_percent">{stocks[ticker]?.percentText}</span>
+          </div>
         </div>
       </div>
       <div className="graph">
-        {stocks[ticker] ? (
+        {stocks[ticker] && data.datasets && data.datasets.length > 0 ? (
           <Line data={data}
             options={options}
             gridLines={false}
@@ -76,7 +112,9 @@ function Stock({ ticker }) {
             width={"650px"}
           />
         ) : (
-          <h3>Loading...</h3>
+          <div style={{height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+            <h3>Loading chart data...</h3>
+          </div>
         )}
       </div>
 

@@ -1,101 +1,144 @@
-* {
-  box-sizing: border-box;
-  font-family: "Capsule Sans Display", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  margin: 0px;
-  padding: 0px;
-  font-size: 18px;
-}
-
-svg {
-  width: 100%;
-}
+/* Robinhood Navbar Styling */
 
 #navbar-container {
-  /* border: 1px solid red; */
-  box-sizing: border-box;
   height: 64px;
-  /* position: fixed; */
-  /* position:absolute; */
   width: 100%;
   display: flex;
   flex-flow: row nowrap;
-  /* justify-content: space-between; */
   align-items: center;
-}
-
-#magnifier {
-  width: 20px;
-}
-
-#search-container {
-  height: 36px;
-  border-radius: 4px;
-  border: 1px solid rgb(227, 233, 237);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-width: 40%;
-}
-
-#search-container:focus-within {
-  box-shadow: rgba(0, 0, 0, 0.02) 0px -12px 12px 0px, rgba(0, 0, 0, 0.06) 0px 12px 12px 0px, rgba(0, 0, 0, 0.02) 0px -12px 12px, rgba(0, 0, 0, 0.02) 0px 12px 12px;
-}
-
-#search_bar {
-  width: 90%;
-}
-
-#nav-spacer {
-  /* background-color: blue; */
-  min-width: 10%;
-}
-
-.links_container {
-  /* border: 1px solid red; */
-  font-size: 13px;
-  font-weight: 700;
-  min-width: 30%;
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-between;
-  align-items: center;
-  height: inherit;
-  margin-right: 1rem;
-}
-
-.nav-link, .nav-link-div {
-  height: inherit;
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  color: black;
-  font-size: inherit;
-  font-weight: 700;
-}
-
-.nav-link-div {
-  border-bottom: 2px transparent black;
-}
-
-.nav-link-div:hover {
-  border-bottom: 2px solid rgb(0, 200, 5);
-}
-
-.navbar_contianer::after {
-  content: "";
-  clear: both;
-  display: table;
+  background-color: var(--rh-white);
+  border-bottom: 1px solid var(--rh-gray-200);
+  padding: 0 var(--spacing-xl);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
 }
 
 #logo-container {
   height: 100%;
   width: 60px;
   display: flex;
-  justify-content: space-around;
+  align-items: center;
+  justify-content: center;
+  margin-right: var(--spacing-xl);
 }
 
 #logo-container svg {
-  width: 75px;
+  width: 32px;
+  height: 32px;
+  fill: var(--rh-green);
+  transition: transform 0.2s ease;
+}
+
+#logo-container:hover svg {
+  transform: scale(1.05);
+}
+
+#search-container {
+  height: 48px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rh-gray-300);
+  background-color: var(--rh-gray-100);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--spacing-lg);
+  min-width: 360px;
+  max-width: 500px;
+  flex-grow: 1;
+  transition: all 0.2s ease;
+}
+
+#search-container:focus-within {
+  background-color: var(--rh-white);
+  border-color: var(--rh-black);
+  box-shadow: var(--shadow-md);
+}
+
+#magnifier {
+  width: 20px;
+  height: 20px;
+  margin-right: var(--spacing-sm);
+  opacity: 0.5;
+}
+
+#search-container:focus-within #magnifier {
+  opacity: 1;
+}
+
+#search_bar {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  color: var(--rh-black);
+}
+
+#search_bar::placeholder {
+  color: var(--rh-gray-600);
+}
+
+#nav-spacer {
+  flex-grow: 1;
+  min-width: var(--spacing-xl);
+}
+
+.links_container {
+  font-size: 15px;
+  font-weight: 500;
+  display: flex;
+  flex-flow: row nowrap;
+  gap: var(--spacing-sm);
+  align-items: center;
+  height: inherit;
+}
+
+.nav-link,
+.nav-link-div {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--rh-black);
+  font-size: 15px;
+  font-weight: 500;
+  padding: 0 var(--spacing-lg);
+  border-radius: var(--radius-md);
+  position: relative;
+  transition: background-color 0.2s ease;
+}
+
+.nav-link-div:hover {
+  background-color: var(--rh-gray-100);
+}
+
+.nav-link-div::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%) scaleX(0);
+  width: calc(100% - var(--spacing-xl) * 2);
+  height: 3px;
+  background-color: var(--rh-green);
+  border-radius: var(--radius-full);
+  transition: transform 0.2s ease;
+}
+
+.nav-link-div:hover::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+/* Active state */
+.nav-link-div.active::after {
+  transform: translateX(-50%) scaleX(1);
+}
+
+.navbar_container::after {
+  content: "";
+  clear: both;
+  display: table;
 }
 
 .search_bar {
