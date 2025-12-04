@@ -10,13 +10,13 @@ import { updateBalance } from '../store/userStore';
 
 export default function BuyPanel({ ticker }) {
 
-
+console.log(ticker, "ticker in buy panel------------------------")
     const dispatch = useDispatch();
     const user = useSelector(state => state.session.user)
     const portfolio = useSelector(state => state.portfolio)
     const stocks = useSelector(state => state.stocks)
     console.log(portfolio, "portfilio object so i can query price>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
-    console.log(portfolio[ticker], "stocks object------------------------")
+    console.log(portfolio, "stocks object------------------------")
     let currentPrice = 0
 
     useEffect(() => {

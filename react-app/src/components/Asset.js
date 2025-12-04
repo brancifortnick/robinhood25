@@ -1,80 +1,54 @@
-import React, { useEffect, useState } from 'react';
-
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { getSingleStock } from '../store/stocksStore';
-import { useParams } from "react-router-dom";
-import BuyPanel from "./BuyPanel"
-import "./Asset.css"
 import Stock from './Stock';
+import BuyPanel from './BuyPanel';
 
 export default function Asset() {
-
-    let { ticker } = useParams();
-    ticker = ticker.toUpperCase()
-
+    const { ticker } = useParams();
     const dispatch = useDispatch();
-    const stock = useSelector(state => state.stocks)
-    const user = useSelector(state => state.session.user)
+    const stock = useSelector(state => state.stocks[ticker]);
+    const newsArray = [1, 2, 3];
 
     useEffect(() => {
-        (async () => {
-            await dispatch(getSingleStock(ticker))
-        })();
-    }, [dispatch, ticker])
-
-    const newsArray = [1, 2, 3]
+        if (ticker) {
+            dispatch(getSingleStock(ticker));
+        }
+    }, [dispatch, ticker]);
 
     return (
         <div id="mega-container">
-            <div id="asset-container" >
-                <div id="chart" >
+            <div id="asset-container">
+                <div id="chart">
                     <Stock ticker={ticker} />
-                   
                 </div>
-                <div className="titles">About</div >
+                <div className="titles">About</div>
                 <div id="company-description">
-                    {stock?.description ? stock.description.slice(0, 500) : ""}
+                    {stock?.description ? stock.description.slice(0, 500) : "Loading company information..."}
                     <span style={{ "color": "rgb(0,200,5)", "fontWeight": "700" }}>Read More</span>
                     <br />
                     <br />
                 </div>
                 <div className={"about"}>
-                    <div><p>Top Holder</p><span>{stock?.holder0}</span></div>
-                    {/* <div><p>Headquarters</p><span>{stock?.address.slice(0, 11)}</span></div> */}
-                    <div><p>YTD Price</p><span>{stock?.results?.description}</span></div>
-                    <div><p>Analyst Score</p><span>{stock?.tradeWords}</span></div>
+                    <div><p>Market Cap</p><span>${stock?.marketCap ? (stock.marketCap / 1000000).toFixed(0) : 0}M</span></div>
+                    <div><p>Homepage</p><span>{stock?.homepage_url || 'N/A'}</span></div>
+                    <div><p>Current Price</p><span>${stock?.currentPrice || '0.00'}</span></div>
+                    <div><p>Price Change</p><span>{stock?.percentText || '0%'}</span></div>
                 </div>
-                <div className="titles">Key Statistics</div >
+                <div className="titles">Key Statistics</div>
                 <div className={"key-statistics"}>
-                    {/* <div><p>Market Cap</p><span>{stock?.marketCap.toString().slice(0, 3)}M</span></div> */}
-                    <div><p style={{"padding-right":"4px"}}>Price-Earnings Ratio</p><span>38.94</span></div>
-                    <div><p>Dividend Yield</p><span>0.77</span></div>
-                    <div><p>Average Volume</p><span>27.24M</span></div>
-                </div >
-
-                <div className="titles">News</div >
-                <div id="news-container">
-                    {newsArray.map(id => {
-                        return (
-                            <div className={"news-div"} key={`news${id}`}>
-                                <span style={{ "font-size": "13px", "font-weight": "500" }}>{stock?.[`newsSource${id}`]} </span>
-
-                                {/* <span style={{ "font-size": "13px", "font-weight": "400", "color": "rgb(111,120,126)" }}>{stock?.[`newsDate${id}`].slice(0, 7).replace("-"," ")}</span> */}
-
-                                {/* <div className={"news-headline"}>{stock?.[`newsArticle${id}`].slice(0, 50)}...</div> */}
-
-                                {/* <div className={"news-link"}>{stock?.[`newsLink${id}`].slice(0, 66)} ...</div> */}
-                            </div>
-                        )
-                    })}
+                    <div><p style={{"paddingRight":"4px"}}>Price-Earnings Ratio</p><span>N/A</span></div>
+                    <div><p>Dividend Yield</p><span>N/A</span></div>
+                    <div><p>Average Volume</p><span>N/A</span></div>
                 </div>
-
-
+                <div className="titles">News</div>
+                <div id="news-container">
+                    <div>News integration coming soon...</div>
+                </div>
             </div>
             <div id="right-panel">
-
-                <BuyPanel ticker={ ticker}/>
-
+                <BuyPanel ticker={ticker}/>
             </div>
         </div>
     )

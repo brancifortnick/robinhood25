@@ -8,23 +8,23 @@ import os
 portfolio_stocks_routes = Blueprint('portfolio_stocks', __name__)
 
 # You'll need to set this in your environment variables or config
-POLYGON_API_KEY = os.getenv('POLYGON_API_KEY')
+ALPHA_VANTAGE_API_KEY = os.getenv('ALPHA_VANTAGE_API_KEY')
 
 
-
+@portfolio_stocks_routes.route('/test')
+@login_required
 def get_stock_price(ticker):
     try:
-        # Get previous close price from Polygon.io
+        # Get current price from Alpha Vantage Global Quote
         response = requests.get(
-            f"https://api.polygon.io/v3/reference/tickers/{ticker}?apikey={POLYGON_API_KEY}")
+            f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={ALPHA_VANTAGE_API_KEY}")
         data = response.json()
 
-        if data.get('status') == 'OK' and data.get('resultsCount', 0) > 0:
-            results = data.get('results', [])
-            if results:
-                # 'c' is close price
-                current_price = float(results[0].get('c'), 0)
-                return current_price
+        global_quote = data.get('Global Quote', {})
+        if global_quote:
+            # '05. price' is the current price
+            current_price = float(global_quote.get('05. price', 0))
+            return current_price
 
         return None
     except:
