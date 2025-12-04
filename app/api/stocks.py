@@ -68,13 +68,29 @@ def fetch_intraday_data(ticker, api_key):
         
         if 'Time Series (5min)' in data:
             time_series = data['Time Series (5min)']
-            # Get last 20 data points for daily chart
+            # Get data points during trading hours (9:30 AM - 4:00 PM ET)
             prices = []
-            for timestamp in sorted(time_series.keys(), reverse=True)[:20]:
-                prices.append(float(time_series[timestamp]['4. close']))
-            return list(reversed(prices))  # Reverse to show chronologically
+            timestamps = []
+            
+            for timestamp in sorted(time_series.keys(), reverse=True):
+                # Parse timestamp
+                dt = datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S')
+                hour = dt.hour
+                minute = dt.minute
+                
+                # Only include trading hours (9:30 - 16:00)
+                if (hour == 9 and minute >= 30) or (10 <= hour < 16):
+                    prices.append(float(time_series[timestamp]['4. close']))
+                    timestamps.append(timestamp)
+                    
+                if len(prices) >= 78:  # Full trading day (6.5 hours * 12 five-min intervals)
+                    break
+            
+            if len(prices) > 0:
+                return list(reversed(prices))  # Reverse to show chronologically
         return None
-    except:
+    except Exception as e:
+        print(f"Error fetching intraday data: {e}")
         return None
 
 
@@ -127,15 +143,29 @@ def get_stock(ticker):
             'inPortfolio': False,
             'shares': 0,
             'basis': 0,
-            'dailyPrices': [98, 100, 102, 101, 103, 104, 103, 105, 106, 108],
-            'dailyPricesLabels': ['9AM', '10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM'],
-            'weeklyPrices': [95, 97, 100, 103, 105, 108, 106],
+            # Realistic intraday data (9:30 AM - 4:00 PM, 78 data points)
+            'dailyPrices': [98.5, 98.8, 99.2, 99.5, 99.8, 100.1, 100.3, 100.5, 100.8, 101.0,
+                           101.2, 101.5, 101.3, 101.1, 100.9, 101.2, 101.5, 101.8, 102.0, 102.3,
+                           102.5, 102.7, 103.0, 103.2, 103.0, 102.8, 102.5, 102.7, 103.0, 103.3,
+                           103.5, 103.8, 104.0, 104.2, 104.5, 104.3, 104.1, 103.9, 104.2, 104.5,
+                           104.8, 105.0, 105.2, 105.5, 105.7, 106.0, 106.2, 106.0, 105.8, 106.1,
+                           106.4, 106.7, 107.0, 107.2, 107.5, 107.3, 107.1, 107.4, 107.7, 108.0,
+                           108.2, 108.5, 108.7, 109.0, 108.8, 108.6, 108.9, 109.2, 109.5, 109.7,
+                           110.0, 110.2, 110.5, 110.7, 110.5, 110.3, 110.5, 110.8],
+            'dailyPricesLabels': ['9:30 AM', '9:50 AM', '10:10 AM', '10:30 AM', '10:50 AM', '11:10 AM', '11:30 AM', '11:50 AM',
+                                 '12:10 PM', '12:30 PM', '12:50 PM', '1:10 PM', '1:30 PM', '1:50 PM', '2:10 PM', '2:30 PM',
+                                 '2:50 PM', '3:10 PM', '3:30 PM', '3:50 PM'],
+            'weeklyPrices': [95.2, 97.5, 100.3, 103.8, 105.9, 108.2, 106.8],
             'weeklyPricesLabels': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-            'oneMonthPrices': [90, 93, 95, 98, 100, 103, 105, 108, 110, 112],
-            'oneMonthPricesLabels': ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8', 'Week 9', 'Week 10'],
-            'yearlyPrices': [80, 85, 90, 95, 100, 105, 110, 115, 120, 125],
-            'yearlyPricesLabels': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
-            'allTimePrices': [50, 60, 70, 80, 90, 100, 110, 120, 130, 140],
+            'oneMonthPrices': [90.5, 92.0, 93.5, 95.0, 96.5, 98.0, 99.5, 101.0, 102.5, 104.0, 
+                              105.5, 107.0, 108.5, 110.0, 111.5, 113.0, 112.5, 112.0, 113.5, 115.0,
+                              116.5, 118.0, 117.5, 117.0, 118.5, 120.0, 119.5, 119.0, 120.5, 122.0],
+            'oneMonthPricesLabels': ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+                                     '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+                                     '21', '22', '23', '24', '25', '26', '27', '28', '29', '30'],
+            'yearlyPrices': [80.0, 85.5, 90.0, 95.5, 100.0, 105.5, 110.0, 115.5, 120.0, 125.5, 130.0, 135.5],
+            'yearlyPricesLabels': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            'allTimePrices': [50.0, 60.0, 70.0, 80.0, 90.0, 100.0, 110.0, 120.0, 130.0, 140.0],
             'allTimePricesLabels': ['2020', '2021', '2022', '2023', '2024', '2025', '2026', '2027', '2028', '2029']
         }
         

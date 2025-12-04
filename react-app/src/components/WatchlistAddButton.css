@@ -1,6 +1,134 @@
 /* Robinhood Add to Watchlist Button */
 
+.add-watchlist-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-sm);
+  background-color: var(--rh-white);
+  color: var(--rh-green);
+  border: 2px solid var(--rh-green);
+  font-size: 15px;
+  font-weight: 600;
+  height: 56px;
+  border-radius: var(--radius-md);
+  padding: 0 var(--spacing-xl);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.add-watchlist-button::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background-color: var(--rh-green-light);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.add-watchlist-button:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.add-watchlist-button .button-icon,
+.add-watchlist-button .button-text {
+  position: relative;
+  z-index: 1;
+}
+
+.add-watchlist-button .button-icon {
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.add-watchlist-button:hover .button-icon {
+  transform: scale(1.2) rotate(10deg);
+}
+
+.add-watchlist-button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--rh-green-dark);
+}
+
+.add-watchlist-button:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-sm);
+}
+
+/* When item is in watchlist */
+.add-watchlist-button.in-watchlist {
+  background-color: var(--rh-green);
+  color: var(--rh-white);
+  border-color: var(--rh-green);
+}
+
+.add-watchlist-button.in-watchlist::before {
+  background-color: var(--rh-green-dark);
+}
+
+.add-watchlist-button.in-watchlist:hover {
+  background-color: var(--rh-green-dark);
+  border-color: var(--rh-green-dark);
+}
+
+.add-watchlist-button.in-watchlist .button-icon {
+  animation: starPulse 0.5s ease;
+}
+
+@keyframes starPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+}
+
+/* Adding state (during API call) */
+.add-watchlist-button.adding {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.add-watchlist-button.adding .button-icon {
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Disabled state */
+.add-watchlist-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.add-watchlist-button:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Old class for backwards compatibility */
 .add-button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: var(--rh-white);
   color: var(--rh-green);
   border: 2px solid var(--rh-green);
@@ -22,4 +150,5 @@
 .add-button:active {
   transform: translateY(0);
 }
+
 

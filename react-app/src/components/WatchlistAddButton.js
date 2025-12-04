@@ -1,33 +1,55 @@
-import React,{useEffect} from "react";
-import { useDispatch } from "react-redux";
-import { getAllInWatchList, addNewTicker } from "../store/watchlistStore";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllInWatchList, addNewTicker, deleteTickerThunk } from "../store/watchlistStore";
 import { useHistory } from "react-router-dom";
 import './WatchlistAddButton.css'
 
 function WatchlistAddButton({ ticker }) {
   const dispatch = useDispatch();
   const history = useHistory();
+  const watchlist = useSelector(state => state.watchlist);
+  const [isInWatchlist, setIsInWatchlist] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
 
+  useEffect(() => {
+    dispatch(getAllInWatchList());
+  }, [dispatch]);
 
+  useEffect(() => {
+    // Check if ticker is in watchlist
+    const inWatchlist = Object.values(watchlist).some(stock => stock.ticker === ticker);
+    setIsInWatchlist(inWatchlist);
+  }, [watchlist, ticker]);
+
+  const handleClick = async () => {
+    setIsAdding(true);
+    try {
+      if (isInWatchlist) {
+        await dispatch(deleteTickerThunk(ticker));
+      } else {
+        await dispatch(addNewTicker(ticker));
+      }
+      await dispatch(getAllInWatchList());
+    } catch (error) {
+      console.error('Error updating watchlist:', error);
+    } finally {
+      setTimeout(() => setIsAdding(false), 300);
+    }
+  };
 
   return (
-    // <div className="add-ticker-container">
-
     <button
-      className="add-button"
-      onClick={async () => {
-        await dispatch(addNewTicker(ticker));
-        await dispatch(getAllInWatchList());
-       
-      
-      }}
-
+      className={`add-watchlist-button ${isInWatchlist ? 'in-watchlist' : ''} ${isAdding ? 'adding' : ''}`}
+      onClick={handleClick}
+      disabled={isAdding}
     >
-      ✔︎ Add {ticker} to Watchlist
+      <span className="button-icon">
+        {isInWatchlist ? '★' : '☆'}
+      </span>
+      <span className="button-text">
+        {isInWatchlist ? `Remove from Watchlist` : `Add to Watchlist`}
+      </span>
     </button>
-
-
-    // </div>
   );
 }
 export default WatchlistAddButton;
