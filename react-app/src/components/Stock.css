@@ -71,19 +71,25 @@
 
 /* Graph Container */
 .graphContainer {
-  height: 400px;
   width: 100%;
   margin-bottom: var(--spacing-xl);
   background-color: var(--rh-white);
   border-radius: var(--radius-lg);
   position: relative;
   padding: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
 }
 
 .graph {
-  height: 350px;
+  height: 400px;
   width: 100%;
   margin-bottom: var(--spacing-md);
+  position: relative;
+}
+
+.graph canvas {
+  max-width: 100% !important;
+  height: 100% !important;
 }
 
 /* Graph Time Period Buttons */

@@ -42,14 +42,19 @@ def portfolio():
 
 # /api/portfolio-stocks/:ticker/:operator
 
-
-@login_required
 @portfolio_stocks_routes.route('/<ticker>/<operator>', methods=['POST'])
+@login_required
 def add_ticker_to_portfolio(ticker, operator):
     ticker = ticker.upper()
+    
+    print(f"=== ADD/SUBTRACT STOCK REQUEST ===")
+    print(f"Ticker: {ticker}, Operator: {operator}")
+    print(f"Request content type: {request.content_type}")
+    print(f"Request data: {request.get_data()}")
 
     # Validate operator
     if operator not in ['add', 'subtract']:
+        print(f"ERROR: Invalid operator: {operator}")
         return {'error': 'Invalid operation'}, 400
 
     stock_already_in_portfolio = PortfolioStocks.query.filter(
@@ -57,35 +62,54 @@ def add_ticker_to_portfolio(ticker, operator):
         PortfolioStocks.ticker == ticker
     ).one_or_none()
 
-    # Get current price from Polygon.io
-    current_price = get_stock_price(ticker)
+    # Get current price from request body or fetch from API
+    request_data = request.get_json(silent=True) or {}
+    print(f"Parsed JSON: {request_data}")
+    current_price = request_data.get('price')
+    print(f"Price from request: {current_price}")
+    
     if current_price is None:
-        return {'error': 'Unable to fetch stock price'}, 503
+        # Fall back to API if price not provided
+        print("No price provided, fetching from API...")
+        current_price = get_stock_price(ticker)
+        if current_price is None:
+            # Use a default basis if API fails
+            current_price = stock_already_in_portfolio.basis if stock_already_in_portfolio else 100.0
+            print(f"Warning: Could not fetch price for {ticker}, using fallback: ${current_price}")
+    
+    print(f"Final price to use: ${current_price}")
 
     if stock_already_in_portfolio:
+        print(f"Stock found in portfolio: {stock_already_in_portfolio.share_count} shares")
         if operator == 'add':
             expanded_basis = round(
                 stock_already_in_portfolio.share_count * stock_already_in_portfolio.basis, 2)
             stock_already_in_portfolio.share_count += 1
             new_basis = round((expanded_basis + current_price) /
                               stock_already_in_portfolio.share_count, 2)
-            print(f'hey, {new_basis}')
+            print(f'New basis calculated: {new_basis}')
             stock_already_in_portfolio.basis = new_basis
         else:  # subtract
-            if stock_already_in_portfolio.share_count >= 0:
+            if stock_already_in_portfolio.share_count > 0:
                 stock_already_in_portfolio.share_count -= 1
+                print(f"Sold 1 share, new count: {stock_already_in_portfolio.share_count}")
             else:
+                print("ERROR: No shares to sell")
                 return {'error': 'Cannot sell - no shares to sell'}, 400
 
         db.session.add(stock_already_in_portfolio)
         db.session.commit()
+        print(f"SUCCESS: Updated portfolio stock")
         print(stock_already_in_portfolio.to_dict(),
               "backend ------<><><><><> PORTFOLIO STOCKS!!!!!!!!!!!!!!!!!!")
         return stock_already_in_portfolio.to_dict()
     else:
+        print("Stock not in portfolio")
         if operator == 'subtract':
+            print("ERROR: Cannot sell stock not owned")
             return {'error': 'Cannot sell stock not in portfolio'}, 400
 
+        print("Creating new portfolio entry...")
         purchased_stock = PortfolioStocks(
             ticker=ticker,
             basis=current_price,
@@ -94,4 +118,5 @@ def add_ticker_to_portfolio(ticker, operator):
         )
         db.session.add(purchased_stock)
         db.session.commit()
+        print("SUCCESS: Added new stock to portfolio")
         return purchased_stock.to_dict()

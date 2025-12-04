@@ -18,7 +18,7 @@ export const getSingleStock = (ticker) => async dispatch => {
   if (response.ok) {
     const stock = await response.json();
     dispatch(loadOneStock(stock));
-  };
+  }
 };
 
 export const getMultipleStocks = (tickersList) => async dispatch => {

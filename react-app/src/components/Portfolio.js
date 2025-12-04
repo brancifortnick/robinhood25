@@ -5,37 +5,40 @@ import './Portfolio.css';
 
 
 function Portfolio() {
-  const stocks = useSelector(state => Object.values(state.portfolio || {}));
+  const portfolio = useSelector(state => state.portfolio || {});
+  const stocks = Object.values(portfolio);
   const [stockPrices, setStockPrices] = useState({});
+  const [hasFetched, setHasFetched] = useState(false);
   
   useEffect(() => {
-    // Fetch current prices for all stocks in portfolio
-    const fetchPrices = async () => {
-      const prices = {};
-      for (let stock of stocks) {
-        try {
-          const response = await fetch(`/api/stocks/${stock.ticker}`);
-          if (response.ok) {
-            const data = await response.json();
-            prices[stock.ticker] = {
-              currentPrice: data.currentPrice || data.price || 0,
-              percentChange: data.percentChange || 0,
-              companyName: data.companyName || stock.ticker,
-              logoUrl: data.logoUrl,
-              logoFallback: data.logoFallback
-            };
+    // Only fetch prices once when component mounts or portfolio changes significantly
+    if (stocks.length > 0 && !hasFetched) {
+      const fetchPrices = async () => {
+        const prices = {};
+        for (let stock of stocks) {
+          try {
+            const response = await fetch(`/api/stocks/${stock.ticker}`);
+            if (response.ok) {
+              const data = await response.json();
+              prices[stock.ticker] = {
+                currentPrice: data.currentPrice || data.price || 0,
+                percentChange: data.percentChange || 0,
+                companyName: data.companyName || stock.ticker,
+                logoUrl: data.logoUrl,
+                logoFallback: data.logoFallback
+              };
+            }
+          } catch (error) {
+            console.error(`Error fetching price for ${stock.ticker}:`, error);
           }
-        } catch (error) {
-          console.error(`Error fetching price for ${stock.ticker}:`, error);
         }
-      }
-      setStockPrices(prices);
-    };
-    
-    if (stocks.length > 0) {
+        setStockPrices(prices);
+        setHasFetched(true);
+      };
+      
       fetchPrices();
     }
-  }, [stocks]);
+  }, [stocks.length, hasFetched]);
 
   if (!stocks.length) {
     return (

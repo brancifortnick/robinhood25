@@ -19,27 +19,20 @@ export default function BuyPanel({ ticker }) {
     const [loading, setLoading] = useState(true);
     
     useEffect(() => {
+        // Only fetch portfolio on mount
         dispatch(getPortfolio())
-        dispatch(getSingleStock(ticker))
-    }, [dispatch, ticker])
+    }, [dispatch])
 
-    // Fetch current stock price
+    // Get current stock price from Redux store
     useEffect(() => {
-        const fetchPrice = async () => {
-            try {
-                const response = await fetch(`/api/stocks/${ticker}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setCurrentPrice(data.currentPrice || data.price || 0);
-                }
-            } catch (error) {
-                console.error('Error fetching stock price:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchPrice();
-    }, [ticker]);
+        const stockData = stocks[ticker];
+        if (stockData && stockData.currentPrice) {
+            setCurrentPrice(stockData.currentPrice);
+            setLoading(false);
+        } else {
+            setLoading(false);
+        }
+    }, [ticker, stocks]);
 
     // Safety checks
     if (!user) {
@@ -82,8 +75,16 @@ export default function BuyPanel({ ticker }) {
                         alert(`Insufficient funds. You need $${stockPrice.toFixed(2)} but only have $${cashBalance.toFixed(2)}`);
                         return;
                     }
-                    await dispatch(updateStock(ticker, "add"));
-                    await dispatch(getPortfolio());
+                    try {
+                        // Update stock portfolio with price
+                        await dispatch(updateStock(ticker, "add", stockPrice));
+                        // Update user's cash balance (subtract the cost)
+                        await dispatch(updateBalance(stockPrice, "subtract"));
+                        // Refresh portfolio data
+                        await dispatch(getPortfolio());
+                    } catch (error) {
+                        alert('Error buying stock: ' + error.message);
+                    }
                 }}>Buy 1 Share</button>
                 <br></br>
                 <button id='sell' onClick={async () => {
@@ -91,8 +92,16 @@ export default function BuyPanel({ ticker }) {
                         alert('You do not own any shares of this stock.');
                         return;
                     }
-                    await dispatch(updateStock(ticker, "subtract"));
-                    await dispatch(getPortfolio());
+                    try {
+                        // Update stock portfolio with price
+                        await dispatch(updateStock(ticker, "subtract", stockPrice));
+                        // Update user's cash balance (add the sale proceeds)
+                        await dispatch(updateBalance(stockPrice, "add"));
+                        // Refresh portfolio data
+                        await dispatch(getPortfolio());
+                    } catch (error) {
+                        alert('Error selling stock: ' + error.message);
+                    }
                 }}>Sell 1 Share</button>
             </div>
                 <div id="buy-4">

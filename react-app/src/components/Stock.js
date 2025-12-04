@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import { getSingleStock } from '../store/stocksStore';
 import { Line } from 'react-chartjs-2';
 import { updateStock } from '../store/portfolioStore';
@@ -30,7 +31,8 @@ ChartJS.register(
   Filler
 );
 
-function Stock({ ticker }) {
+function Stock() {
+  const { ticker } = useParams();
   const [timePeriod, setTimePeriod] = useState('dailyPrices')
   const [hoveredPrice, setHoveredPrice] = useState(null)
   const [hoveredTime, setHoveredTime] = useState(null)
@@ -191,9 +193,8 @@ function Stock({ ticker }) {
   };
 
   useEffect(() => {
-    (async () => {
-      await dispatch(getSingleStock(ticker));
-    })();
+    // Fetch stock data only when ticker changes
+    dispatch(getSingleStock(ticker));
   }, [dispatch, ticker])
 
   useEffect(() => {
@@ -292,11 +293,9 @@ function Stock({ ticker }) {
       </div>
       <div className="graph">
         {stocks[ticker] && data.datasets && data.datasets.length > 0 ? (
-          <Line data={data}
+          <Line 
+            data={data}
             options={options}
-            gridLines={false}
-            height={400}
-            width={"650px"}
           />
         ) : (
           <div style={{height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>

@@ -10,10 +10,15 @@ function WatchlistAddButton({ ticker }) {
   const watchlist = useSelector(state => state.watchlist);
   const [isInWatchlist, setIsInWatchlist] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
 
   useEffect(() => {
-    dispatch(getAllInWatchList());
-  }, [dispatch]);
+    // Only fetch watchlist once on mount
+    if (!hasLoaded) {
+      dispatch(getAllInWatchList());
+      setHasLoaded(true);
+    }
+  }, [dispatch, hasLoaded]);
 
   useEffect(() => {
     // Check if ticker is in watchlist

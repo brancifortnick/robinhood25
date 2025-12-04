@@ -20,15 +20,20 @@ export const getPortfolio = () => async dispatch => {
     }
 };
 
-export const updateStock = (ticker, operator) => async dispatch => {
+export const updateStock = (ticker, operator, price) => async dispatch => {
     if (operator === 'add' || operator === 'subtract') {
         const response = await fetch(`/api/portfolio-stocks/${ticker}/${operator}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ price })
         });
         if (response.ok) {
             const purchasedStock = await response.json();
             dispatch(addStock(purchasedStock));
+        } else {
+            const error = await response.json();
+            console.error('Error updating stock:', error);
+            throw new Error(error.error || 'Failed to update stock');
         }
     }
 };

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
@@ -9,10 +9,8 @@ import "./Watchlist.css";
 function Watchlist() {
   const stocks = useSelector((state) => state.stocks);
   const watchlist = useSelector((state) => state.watchlist);
-console.log(watchlist, 'watchlist from useSelector00000000000000000000000000000000000000000000000000');
-
-  console.log(watchlist, 'watchlist object000000000000000000000000000000000000000000000000000')
   const dispatch = useDispatch();
+  const [hasFetchedStocks, setHasFetchedStocks] = useState(false);
 
   useEffect(() => {
     dispatch(getAllInWatchList());
@@ -20,14 +18,14 @@ console.log(watchlist, 'watchlist from useSelector000000000000000000000000000000
 
   useEffect(() => {
     const watchlistValuesArray = Object.values(watchlist);
-    if (watchlistValuesArray) {
-      console.log(watchlistValuesArray, 'watchlistValuesArray from useEffect00000000000000000000000000000000000000000000000000')
+    if (watchlistValuesArray.length > 0 && !hasFetchedStocks) {
+      console.log('Fetching stocks for watchlist items...');
       for (const stock of watchlistValuesArray) {
         dispatch(getSingleStock(stock.ticker));
       }
-      // dispatch(getMultipleStocks(watchlistValuesArray))
+      setHasFetchedStocks(true);
     }
-  }, [watchlist]);
+  }, [watchlist.length, dispatch, hasFetchedStocks]);
 
 
   return (
