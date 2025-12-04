@@ -13,8 +13,11 @@
       ```
 - [ ] Install dependencies: `pip install -r requirements.txt`
 - [ ] Test the API: `python test_api.py`
+- [ ] Run migrations: `flask db upgrade`
+- [ ] **Seed database with real stock data**: `flask seed all` (takes ~1-2 min)
 - [ ] Run the app: `flask run`
-- [ ] Visit http://localhost:5000 and test a stock
+- [ ] Visit http://localhost:5000 and test with Demo user
+- [ ] Login credentials: `demo@aa.io` / `password`
 
 ## Step 3: Deploy to Heroku
 - [ ] Set environment variable:
@@ -24,11 +27,19 @@
 - [ ] Commit changes:
       ```bash
       git add .
-      git commit -m "Updated to Alpha Vantage API"
+      git commit -m "Updated to Alpha Vantage API with real stock seeding"
       ```
 - [ ] Deploy:
       ```bash
       git push heroku main
+      ```
+- [ ] Run migrations on Heroku:
+      ```bash
+      heroku run flask db upgrade
+      ```
+- [ ] **Seed database on Heroku**:
+      ```bash
+      heroku run flask seed all
       ```
 - [ ] Check logs:
       ```bash

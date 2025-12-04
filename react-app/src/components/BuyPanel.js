@@ -10,20 +10,26 @@ import { updateBalance } from '../store/userStore';
 
 export default function BuyPanel({ ticker }) {
 
-console.log(ticker, "ticker in buy panel------------------------")
+    console.log(ticker, "ticker in buy panel------------------------")
     const dispatch = useDispatch();
     const user = useSelector(state => state.session.user)
     const portfolio = useSelector(state => state.portfolio)
     const stocks = useSelector(state => state.stocks)
     console.log(portfolio, "portfilio object so i can query price>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
     console.log(portfolio, "stocks object------------------------")
-    let currentPrice = 0
-
+    
     useEffect(() => {
         dispatch(getPortfolio())
     }, [dispatch])
-    // update user.cash_balance on buys/sells
-    // useEffect(()=> ,[portfolio.stock.share_count])
+
+    // Safety checks
+    if (!user) {
+        return <div>Loading user data...</div>
+    }
+
+    const stockData = portfolio?.[ticker]
+    const shareCount = stockData?.share_count || 0
+    const cashBalance = user?.cash_balance || 0
 
     return (
         <>
@@ -34,28 +40,40 @@ console.log(ticker, "ticker in buy panel------------------------")
 
                 <div id="buy-2">
                     <span>Cur. Quantity</span>
-                    <span>{portfolio?.[ticker]?.share_count}</span>
+                    <span>{shareCount}</span>
                 </div>
 
-                <div id="buy-3">
-                    <button id='buy' onClick={async () => {
-                        await dispatch(updateStock(updateBalance(portfolio[ticker].basis, "subtract")
-                            , "add"));
-                        await dispatch(
-                            updateBalance(portfolio[ticker].basis, "subtract")
-                        );
-                    }}>Buy 1</button>
-                    <br></br>
-                    <button style={{ "background-color": "salmon" }} id='sell' onClick={async () => {
-                        await dispatch(updateStock(ticker, "subtract"));
-                        await dispatch(
-                            updateBalance(portfolio[ticker].basis, "add")
-                        );
-                    }}>Sell 1</button>
-                </div>
-
+            <div id="buy-3">
+                <button id='buy' onClick={async () => {
+                    if (!stockData?.basis) {
+                        console.error('Portfolio data not available for', ticker);
+                        alert('Unable to complete purchase. Please try again.');
+                        return;
+                    }
+                    await dispatch(updateStock(ticker, "add"));
+                    await dispatch(
+                        updateBalance(stockData.basis, "subtract")
+                    );
+                }}>Buy 1</button>
+                <br></br>
+                <button style={{ "background-color": "salmon" }} id='sell' onClick={async () => {
+                    if (!stockData?.basis) {
+                        console.error('Portfolio data not available for', ticker);
+                        alert('Unable to complete sale. Please try again.');
+                        return;
+                    }
+                    if (shareCount <= 0) {
+                        alert('You do not own any shares of this stock.');
+                        return;
+                    }
+                    await dispatch(updateStock(ticker, "subtract"));
+                    await dispatch(
+                        updateBalance(stockData.basis, "add")
+                    );
+                }}>Sell 1</button>
+            </div>
                 <div id="buy-4">
-                    ${user.cash_balance.toFixed(2)} buying power available
+                    ${cashBalance.toFixed(2)} buying power available
                 </div>
             </div>
 
