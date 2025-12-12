@@ -1,31 +1,30 @@
-# FROM node:16 AS build-stage
+FROM node:17 AS build-stage
 
-# WORKDIR /react-app
-# COPY react-app/. .
+WORKDIR /react-app
+COPY react-app/. .
 
-# You have to set this because it should be set during build time.
-# ENV REACT_APP_BASE_URL="https://localhost:5000"
 
-# Build our React App
-# RUN npm install
-# RUN npm run build
+ENV REACT_APP_BASE_URL=https://robin-hood-clone-74aef86e2cd5.herokuapp.com/
 
-# FROM python:3.9
+RUN npm install
+RUN npm run build
 
-# Setup Flask environment
-# ENV FLASK_APP=app
-# ENV FLASK_ENV=development
-# ENV SQLALCHEMY_ECHO=True
+FROM python:3.9
 
-# EXPOSE 8000
 
-# WORKDIR /var/www
-# COPY . .
-# COPY --from=build-stage /react-app/build/* app/static/
+ENV FLASK_APP=app
+ENV FLASK_ENV=production
+ENV SQLALCHEMY_ECHO=True
 
-# Install Python Dependencies
-# RUN pip install -r requirements.txt
-# RUN pip install psycopg2
+EXPOSE 8000
 
-# RUN flask environment
-# CMD gunicorn app:app
+WORKDIR /var/www
+COPY . .
+COPY --from=build-stage /react-app/build/* app/static/
+
+
+RUN pip install -r requirements.txt
+RUN pip install psycopg2
+
+RUN flask environment
+CMD gunicorn app:app
