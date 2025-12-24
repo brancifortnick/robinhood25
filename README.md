@@ -1,17 +1,9 @@
-## ✅ API Updated - Ready to Deploy!
+# [Visit RobinCould - a Robinhood Clone](https://robin-hood-clone-74aef86e2cd5.herokuapp.com/)
 
 A Robinhood clone with real-time stock data powered by **Alpha Vantage API** (free!)
 
-**🚀 Quick Start:** See [DEPLOYMENT.md](DEPLOYMENT.md) for deployment instructions
 
-**📚 Documentation:**
-- [API Setup Guide](API_SETUP.md) - Get your free API key
-- [Seeding Guide](SEEDING_GUIDE.md) - Seed database with real stock prices
-- [Deployment Guide](DEPLOYMENT.md) - Deploy to Heroku, Render, etc.
-- [Migration Summary](MIGRATION_SUMMARY.md) - See what changed
-- [Bug Fixes](BUGFIX_BUYPANEL.md) - Recent fixes
 
-**📋 Resources:**
    *  [Database-Schema](https://github.com/brancifortnick/RobinCould/wiki/Database-Schema)
    *  [User Stories](https://github.com/brancifortnick/RobinCould/wiki/User-Stories)
    
