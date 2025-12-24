@@ -3,6 +3,9 @@
 A Robinhood clone with real-time stock data powered by **Alpha Vantage API** (free!)
 
 
+Refactor of RobinCould with a functioning API.
+API limits requests to 25 per day in case you are missing data such as logo images, accurate market prices, etc.
+I've added a way to pull cached price data amongst other data variables so that the rate limiting won't fully affect the application
 
    *  [Database-Schema](https://github.com/brancifortnick/RobinCould/wiki/Database-Schema)
    *  [User Stories](https://github.com/brancifortnick/RobinCould/wiki/User-Stories)
