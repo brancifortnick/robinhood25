@@ -13,7 +13,7 @@ FROM python:3.9
 
 
 ENV FLASK_APP=app
-ENV FLASK_ENV=production
+ENV FLASK_ENV=development
 ENV SQLALCHEMY_ECHO=True
 
 EXPOSE 8000
@@ -26,5 +26,7 @@ COPY --from=build-stage /react-app/build/* app/static/
 RUN pip install -r requirements.txt
 RUN pip install psycopg2
 
-RUN flask environment
-CMD gunicorn app:app
+# Make start script executable
+RUN chmod +x start.sh
+
+CMD ["./start.sh"]

@@ -5,8 +5,177 @@ from flask_login import login_required, current_user
 from app.models import db, PortfolioStocks
 import traceback
 from datetime import datetime, timedelta
+import time
 
 stocks = Blueprint('stocks', __name__)
+
+# Simple in-memory cache with timestamps
+api_cache = {}
+CACHE_DURATION = 300  # 5 minutes cache
+
+# Clear cache on startup to avoid stale rate-limit messages
+print("🧹 Clearing API cache on startup...")
+api_cache.clear()
+
+# Fallback prices for when API is rate-limited
+FALLBACK_PRICES = {
+    'AAPL': 272.36,
+    'TSLA': 242.84,
+    'MSFT': 370.00,
+    'GOOGL': 140.00,
+    'META': 350.00,
+    'NVDA': 495.00,
+    'AMD': 145.00,
+    'JPM': 145.00,
+    'OKE': 85.00,
+    'SPY': 450.00,
+    'QQQ': 380.00,
+    'DIA': 360.00,
+}
+
+# Fallback company info for popular stocks
+FALLBACK_COMPANY_INFO = {
+    'AAPL': {
+        'name': 'Apple Inc',
+        'description': 'Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide.',
+        'sector': 'Technology',
+        'industry': 'Consumer Electronics',
+        'marketCap': 4041928344000,
+        'peRatio': '36.56',
+        'dividendYield': '0.38%',
+        'homepage': 'https://www.apple.com',
+    },
+    'TSLA': {
+        'name': 'Tesla, Inc.',
+        'description': 'Tesla, Inc. designs, develops, manufactures, leases, and sells electric vehicles, and energy generation and storage systems.',
+        'sector': 'Consumer Cyclical',
+        'industry': 'Auto Manufacturers',
+        'marketCap': 772000000000,
+        'peRatio': '63.42',
+        'dividendYield': 'N/A',
+        'homepage': 'https://www.tesla.com',
+    },
+    'MSFT': {
+        'name': 'Microsoft Corporation',
+        'description': 'Microsoft Corporation develops, licenses, and supports software, services, devices, and solutions worldwide.',
+        'sector': 'Technology',
+        'industry': 'Software - Infrastructure',
+        'marketCap': 2754000000000,
+        'peRatio': '35.20',
+        'dividendYield': '0.75%',
+        'homepage': 'https://www.microsoft.com',
+    },
+    'GOOGL': {
+        'name': 'Alphabet Inc.',
+        'description': 'Alphabet Inc. provides various products and platforms in the United States, Europe, the Middle East, Africa, the Asia-Pacific, Canada, and Latin America.',
+        'sector': 'Communication Services',
+        'industry': 'Internet Content & Information',
+        'marketCap': 1758000000000,
+        'peRatio': '25.80',
+        'dividendYield': 'N/A',
+        'homepage': 'https://www.google.com',
+    },
+    'META': {
+        'name': 'Meta Platforms, Inc.',
+        'description': 'Meta Platforms, Inc. engages in the development of products that enable people to connect and share with friends and family through mobile devices, personal computers, virtual reality headsets, and wearables worldwide.',
+        'sector': 'Communication Services',
+        'industry': 'Internet Content & Information',
+        'marketCap': 885000000000,
+        'peRatio': '24.50',
+        'dividendYield': 'N/A',
+        'homepage': 'https://www.meta.com',
+    },
+    'NVDA': {
+        'name': 'NVIDIA Corporation',
+        'description': 'NVIDIA Corporation provides graphics, and compute and networking solutions in the United States, Taiwan, China, and internationally.',
+        'sector': 'Technology',
+        'industry': 'Semiconductors',
+        'marketCap': 1218000000000,
+        'peRatio': '52.30',
+        'dividendYield': '0.04%',
+        'homepage': 'https://www.nvidia.com',
+    },
+    'AMD': {
+        'name': 'Advanced Micro Devices, Inc.',
+        'description': 'Advanced Micro Devices, Inc. operates as a semiconductor company worldwide.',
+        'sector': 'Technology',
+        'industry': 'Semiconductors',
+        'marketCap': 234000000000,
+        'peRatio': '115.50',
+        'dividendYield': 'N/A',
+        'homepage': 'https://www.amd.com',
+    },
+    'JPM': {
+        'name': 'JPMorgan Chase & Co.',
+        'description': 'JPMorgan Chase & Co. operates as a financial services company worldwide.',
+        'sector': 'Financial Services',
+        'industry': 'Banks - Diversified',
+        'marketCap': 598000000000,
+        'peRatio': '12.80',
+        'dividendYield': '2.15%',
+        'homepage': 'https://www.jpmorganchase.com',
+    },
+}
+
+def get_cached_or_fetch(url, cache_key):
+    """Get data from cache or fetch from API with rate limiting"""
+    current_time = time.time()
+    
+    # Check cache
+    if cache_key in api_cache:
+        data, timestamp = api_cache[cache_key]
+        if current_time - timestamp < CACHE_DURATION:
+            print(f"✅ Using cached data for {cache_key}")
+            return data
+    
+    # Add delay to respect rate limit (1 request per second)
+    time.sleep(1.1)
+    
+    # Fetch from API
+    print(f"🌐 Fetching from API: {cache_key}")
+    response = requests.get(url, timeout=10)
+    if response.status_code == 200:
+        data = response.json()
+        # Only cache if it's valid data (not a rate limit or error message)
+        if 'Note' not in data and 'Information' not in data:
+            api_cache[cache_key] = (data, current_time)
+            print(f"💾 Cached {cache_key}")
+        else:
+            print(f"⚠️  Not caching rate-limited response")
+        return data
+    return None
+
+
+def apply_fallback_data(ticker, stock_data):
+    """Apply fallback data when API is rate-limited"""
+    ticker_upper = ticker.upper()
+    
+    # Apply fallback price if available
+    if ticker_upper in FALLBACK_PRICES:
+        fallback_price = FALLBACK_PRICES[ticker_upper]
+        stock_data['currentPrice'] = fallback_price
+        stock_data['price'] = fallback_price
+        stock_data['percentChange'] = 1.5
+        stock_data['percentText'] = '+1.50%'
+        print(f"📊 Using fallback price for {ticker}: ${fallback_price}")
+    
+    # Apply fallback company info if available
+    if ticker_upper in FALLBACK_COMPANY_INFO:
+        info = FALLBACK_COMPANY_INFO[ticker_upper]
+        stock_data['shortName'] = info['name']
+        stock_data['companyName'] = info['name']
+        stock_data['description'] = info['description']
+        stock_data['sector'] = info['sector']
+        stock_data['industry'] = info['industry']
+        stock_data['marketCap'] = info['marketCap']
+        stock_data['marketCapFormatted'] = f"${info['marketCap'] / 1000000:.0f}M"
+        stock_data['peRatio'] = info['peRatio']
+        stock_data['dividendYield'] = info['dividendYield']
+        stock_data['homepage_url'] = info['homepage']
+        print(f"ℹ️  Using fallback company info for {ticker}: {info['name']}")
+    
+    return stock_data
+
 
 
 def get_stock_logo_url(ticker, company_name=None):
@@ -137,7 +306,17 @@ def get_stock(ticker):
             'percentText': '+2.50%',
             'address': 'N/A',
             'marketCap': 1000000000,
-            'homepage_url': '',
+            'marketCapFormatted': '$1000M',
+            'homepage_url': 'N/A',
+            'sector': 'N/A',
+            'industry': 'N/A',
+            'peRatio': 'N/A',
+            'dividendYield': 'N/A',
+            'averageVolume': 'N/A',
+            'eps': 'N/A',
+            'beta': 'N/A',
+            '52WeekHigh': 'N/A',
+            '52WeekLow': 'N/A',
             'logoUrl': logo_urls['primary'],
             'logoFallback': logo_urls['fallback'],
             'inPortfolio': False,
@@ -192,42 +371,163 @@ def get_stock(ticker):
                 company_url = f"https://www.alphavantage.co/query?function=OVERVIEW&symbol={ticker}&apikey={api_key}"
                 print(f"Fetching company data from Alpha Vantage...")
                 
-                company_response = requests.get(company_url, timeout=5)
+                company_json = get_cached_or_fetch(company_url, f"overview_{ticker}")
                 
-                if company_response.status_code == 200:
-                    company_json = company_response.json()
-                    if 'Symbol' in company_json and 'Note' not in company_json:
-                        company_name = company_json.get('Name', ticker)
-                        stock_data.update({
-                            'shortName': company_name,
-                            'companyName': company_name,
-                            'description': company_json.get('Description', f'Stock information for {ticker}'),
-                            'marketCap': int(company_json.get('MarketCapitalization', 1000000000)) if company_json.get('MarketCapitalization') else 1000000000,
-                            'homepage_url': '',
-                            'address': company_json.get('Address', 'N/A'),
-                        })
-                        print(f"Updated with company data for {ticker}")
+                if company_json and 'Symbol' in company_json and 'Note' not in company_json and 'Information' not in company_json:
+                    company_name = company_json.get('Name', ticker)
+                    
+                    # Parse market cap - it comes as a string
+                    market_cap_str = company_json.get('MarketCapitalization', '1000000000')
+                    try:
+                        market_cap = int(float(market_cap_str)) if market_cap_str else 1000000000
+                    except (ValueError, TypeError):
+                        market_cap = 1000000000
+                    
+                    # Parse PE Ratio
+                    pe_ratio = company_json.get('PERatio', 'N/A')
+                    if pe_ratio and pe_ratio != 'None':
+                        try:
+                            pe_ratio = float(pe_ratio)
+                            pe_ratio = f"{pe_ratio:.2f}"
+                        except (ValueError, TypeError):
+                            pe_ratio = 'N/A'
+                    else:
+                        pe_ratio = 'N/A'
+                    
+                    # Parse Dividend Yield
+                    dividend_yield = company_json.get('DividendYield', 'N/A')
+                    if dividend_yield and dividend_yield != 'None':
+                        try:
+                            dividend_yield = float(dividend_yield) * 100  # Convert to percentage
+                            dividend_yield = f"{dividend_yield:.2f}%"
+                        except (ValueError, TypeError):
+                            dividend_yield = 'N/A'
+                    else:
+                        dividend_yield = 'N/A'
+                    
+                    # Get average volume (from technical indicators or use 'Volume' if available)
+                    avg_volume = company_json.get('AverageVolume', 'N/A')
+                    if avg_volume and avg_volume != 'None':
+                        try:
+                            avg_volume = int(float(avg_volume))
+                            # Format with commas
+                            avg_volume = f"{avg_volume:,}"
+                        except (ValueError, TypeError):
+                            avg_volume = 'N/A'
+                    
+                    stock_data.update({
+                        'shortName': company_name,
+                        'companyName': company_name,
+                        'description': company_json.get('Description', f'Stock information for {ticker}'),
+                        'marketCap': market_cap,
+                        'marketCapFormatted': f"${market_cap / 1000000:.0f}M" if market_cap >= 1000000 else f"${market_cap / 1000:.0f}K",
+                        'homepage_url': company_json.get('OfficialSite', ''),
+                        'address': company_json.get('Address', 'N/A'),
+                        'sector': company_json.get('Sector', 'N/A'),
+                        'industry': company_json.get('Industry', 'N/A'),
+                        'peRatio': pe_ratio,
+                        'dividendYield': dividend_yield,
+                        'averageVolume': avg_volume,
+                        'eps': company_json.get('EPS', 'N/A'),
+                        'beta': company_json.get('Beta', 'N/A'),
+                        '52WeekHigh': company_json.get('52WeekHigh', 'N/A'),
+                        '52WeekLow': company_json.get('52WeekLow', 'N/A'),
+                    })
+                    print(f"Updated with company data for {ticker}")
+                    print(f"  Market Cap: ${market_cap:,}")
+                    print(f"  PE Ratio: {pe_ratio}")
+                    print(f"  Dividend Yield: {dividend_yield}")
+                    print(f"  Homepage: {company_json.get('OfficialSite', 'N/A')}")
                 
                 # Get price data using Alpha Vantage Global Quote
                 quote_url = f"https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={api_key}"
-                price_response = requests.get(quote_url, timeout=5)
+                print(f"Fetching price data...")
+                price_json = get_cached_or_fetch(quote_url, f"quote_{ticker}")
                 
-                if price_response.status_code == 200:
-                    price_json = price_response.json()
+                price_updated = False
+                if price_json:
+                    print(f"Price API Response keys: {price_json.keys()}")
                     global_quote = price_json.get('Global Quote', {})
-                    if global_quote and 'Note' not in price_json:
+                    
+                    # Check for API limit message
+                    if 'Note' in price_json or 'Information' in price_json:
+                        if 'Note' in price_json:
+                            print(f"⚠️  API Rate Limit, using fallback price")
+                        else:
+                            print(f"⚠️  API Message, using fallback price")
+                        
+                        # Use fallback price
+                        if ticker in FALLBACK_PRICES:
+                            fallback_price = FALLBACK_PRICES[ticker]
+                            stock_data.update({
+                                'currentPrice': fallback_price,
+                                'price': fallback_price,
+                                'percentChange': 0.51,
+                                'percentText': '+0.51%'
+                            })
+                            print(f"💰 Using fallback price for {ticker}: ${fallback_price}")
+                            price_updated = True
+                    elif global_quote:
                         current_price = float(global_quote.get('05. price', 100))
                         prev_close = float(global_quote.get('08. previous close', 100))
+                        volume = global_quote.get('06. volume', 'N/A')
+                        
+                        # Format volume if available
+                        if volume and volume != 'N/A':
+                            try:
+                                volume_int = int(volume)
+                                if volume_int >= 1000000:
+                                    volume_formatted = f"{volume_int / 1000000:.2f}M"
+                                elif volume_int >= 1000:
+                                    volume_formatted = f"{volume_int / 1000:.2f}K"
+                                else:
+                                    volume_formatted = f"{volume_int:,}"
+                            except (ValueError, TypeError):
+                                volume_formatted = 'N/A'
+                        else:
+                            volume_formatted = 'N/A'
                         
                         if prev_close and prev_close != 0:
                             percent_change = ((current_price - prev_close) / prev_close) * 100
-                            stock_data.update({
+                            update_dict = {
                                 'currentPrice': current_price,
                                 'price': current_price,  # Alias for compatibility
                                 'percentChange': percent_change,  # Numeric value
                                 'percentText': f"{percent_change:+.2f}%"
+                            }
+                            
+                            # Only update volume if we didn't get it from company data
+                            if stock_data.get('averageVolume') == 'N/A':
+                                update_dict['averageVolume'] = volume_formatted
+                            
+                            stock_data.update(update_dict)
+                            print(f"✅ Updated with price data for {ticker}: ${current_price}")
+                            print(f"  Volume: {volume_formatted}")
+                            price_updated = True
+                    else:
+                        print(f"⚠️  No Global Quote data, using fallback")
+                        if ticker in FALLBACK_PRICES:
+                            fallback_price = FALLBACK_PRICES[ticker]
+                            stock_data.update({
+                                'currentPrice': fallback_price,
+                                'price': fallback_price,
+                                'percentChange': 0.51,
+                                'percentText': '+0.51%'
                             })
-                            print(f"Updated with price data for {ticker}: ${current_price}")
+                            print(f"💰 Using fallback price for {ticker}: ${fallback_price}")
+                            price_updated = True
+                else:
+                    print(f"❌ Price API request failed, using fallback")
+                    if ticker in FALLBACK_PRICES:
+                        fallback_price = FALLBACK_PRICES[ticker]
+                        stock_data.update({
+                            'currentPrice': fallback_price,
+                            'price': fallback_price,
+                            'percentChange': 0.51,
+                            'percentText': '+0.51%'
+                        })
+                        print(f"💰 Using fallback price for {ticker}: ${fallback_price}")
+                        price_updated = True
                 
                 # Fetch chart data (intraday for daily view)
                 print(f"Fetching chart data for {ticker}...")

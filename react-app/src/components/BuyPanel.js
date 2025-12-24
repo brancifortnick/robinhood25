@@ -7,6 +7,7 @@ import "./BuyPanel.css"
 import WatchlistAddButton from './WatchlistAddButton';
 import { updateStock } from '../store/portfolioStore';
 import { updateBalance } from '../store/userStore';
+import { authenticate } from '../store/session';
 
 export default function BuyPanel({ ticker }) {
 
@@ -17,10 +18,12 @@ export default function BuyPanel({ ticker }) {
     const stocks = useSelector(state => state.stocks)
     const [currentPrice, setCurrentPrice] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [isProcessing, setIsProcessing] = useState(false);
     
     useEffect(() => {
-        // Only fetch portfolio on mount
+        // Fetch portfolio and user data on mount
         dispatch(getPortfolio())
+        dispatch(authenticate())
     }, [dispatch])
 
     // Get current stock price from Redux store
@@ -30,9 +33,11 @@ export default function BuyPanel({ ticker }) {
             setCurrentPrice(stockData.currentPrice);
             setLoading(false);
         } else {
+            // Fetch stock data if not available
+            dispatch(getSingleStock(ticker));
             setLoading(false);
         }
-    }, [ticker, stocks]);
+    }, [ticker, stocks, dispatch]);
 
     // Safety checks
     if (!user) {
@@ -47,6 +52,62 @@ export default function BuyPanel({ ticker }) {
     const shareCount = stockData?.share_count || 0
     const cashBalance = user?.cash_balance || 0
     const stockPrice = currentPrice || stockData?.basis || 0
+
+    const handleBuy = async () => {
+        if (isProcessing) return;
+        
+        if (!stockPrice || stockPrice <= 0) {
+            alert('Unable to fetch current stock price. Please try again.');
+            return;
+        }
+        if (cashBalance < stockPrice) {
+            alert(`Insufficient funds. You need $${stockPrice.toFixed(2)} but only have $${cashBalance.toFixed(2)}`);
+            return;
+        }
+        
+        setIsProcessing(true);
+        try {
+            // Update stock portfolio with price
+            await dispatch(updateStock(ticker, "add", stockPrice));
+            // Update user's cash balance (subtract the cost)
+            await dispatch(updateBalance(stockPrice, "subtract"));
+            // Refresh portfolio and user data
+            await dispatch(getPortfolio());
+            await dispatch(authenticate());
+            console.log('Buy completed successfully');
+        } catch (error) {
+            console.error('Error buying stock:', error);
+            alert('Error buying stock: ' + error.message);
+        } finally {
+            setIsProcessing(false);
+        }
+    };
+
+    const handleSell = async () => {
+        if (isProcessing) return;
+        
+        if (shareCount <= 0) {
+            alert('You do not own any shares of this stock.');
+            return;
+        }
+        
+        setIsProcessing(true);
+        try {
+            // Update stock portfolio with price
+            await dispatch(updateStock(ticker, "subtract", stockPrice));
+            // Update user's cash balance (add the sale proceeds)
+            await dispatch(updateBalance(stockPrice, "add"));
+            // Refresh portfolio and user data
+            await dispatch(getPortfolio());
+            await dispatch(authenticate());
+            console.log('Sell completed successfully');
+        } catch (error) {
+            console.error('Error selling stock:', error);
+            alert('Error selling stock: ' + error.message);
+        } finally {
+            setIsProcessing(false);
+        }
+    };
 
     return (
         <>
@@ -66,43 +127,23 @@ export default function BuyPanel({ ticker }) {
                 </div>
 
             <div id="buy-3">
-                <button id='buy' onClick={async () => {
-                    if (!stockPrice || stockPrice <= 0) {
-                        alert('Unable to fetch current stock price. Please try again.');
-                        return;
-                    }
-                    if (cashBalance < stockPrice) {
-                        alert(`Insufficient funds. You need $${stockPrice.toFixed(2)} but only have $${cashBalance.toFixed(2)}`);
-                        return;
-                    }
-                    try {
-                        // Update stock portfolio with price
-                        await dispatch(updateStock(ticker, "add", stockPrice));
-                        // Update user's cash balance (subtract the cost)
-                        await dispatch(updateBalance(stockPrice, "subtract"));
-                        // Refresh portfolio data
-                        await dispatch(getPortfolio());
-                    } catch (error) {
-                        alert('Error buying stock: ' + error.message);
-                    }
-                }}>Buy 1 Share</button>
+                <button 
+                    id='buy' 
+                    onClick={handleBuy}
+                    disabled={isProcessing || cashBalance < stockPrice}
+                    style={{opacity: isProcessing ? 0.6 : 1}}
+                >
+                    {isProcessing ? 'Processing...' : 'Buy 1 Share'}
+                </button>
                 <br></br>
-                <button id='sell' onClick={async () => {
-                    if (shareCount <= 0) {
-                        alert('You do not own any shares of this stock.');
-                        return;
-                    }
-                    try {
-                        // Update stock portfolio with price
-                        await dispatch(updateStock(ticker, "subtract", stockPrice));
-                        // Update user's cash balance (add the sale proceeds)
-                        await dispatch(updateBalance(stockPrice, "add"));
-                        // Refresh portfolio data
-                        await dispatch(getPortfolio());
-                    } catch (error) {
-                        alert('Error selling stock: ' + error.message);
-                    }
-                }}>Sell 1 Share</button>
+                <button 
+                    id='sell' 
+                    onClick={handleSell}
+                    disabled={isProcessing || shareCount <= 0}
+                    style={{opacity: isProcessing ? 0.6 : 1}}
+                >
+                    {isProcessing ? 'Processing...' : 'Sell 1 Share'}
+                </button>
             </div>
                 <div id="buy-4">
                     ${cashBalance.toFixed(2)} buying power available

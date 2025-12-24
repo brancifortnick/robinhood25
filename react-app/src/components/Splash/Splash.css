@@ -161,30 +161,137 @@
   margin: 0 auto;
 }
 
-.fractional__left, .ipo__left {
+.fractional-left, .ipo__left {
   flex: 1;
   max-width: 600px;
 }
 
-.fractional__right, .ipo__right {
+.fractional-right, .ipo__right {
   flex: 1;
   max-width: 600px;
+  padding: var(--spacing-2xl);
 }
 
-.fractional__left h1, .ipo__left h1 {
+.ipo__left img {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.ipo__right .title,
+.fractional-left .title {
   font-size: 48px;
   font-weight: 500;
   letter-spacing: -1.5px;
   line-height: 1.1;
   margin-bottom: var(--spacing-xl);
   color: var(--rh-black);
+  display: block;
 }
 
-.fractional__left p, .ipo__left p {
+.ipo__right p,
+.fractional-left p {
   font-size: 20px;
   line-height: 1.5;
   color: var(--rh-gray-800);
   margin-bottom: var(--spacing-xl);
+}
+
+.ipo-bullets {
+  display: flex;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  align-items: flex-start;
+}
+
+.ipo-bullets-icon {
+  flex: 0 0 40px;
+  height: 40px;
+  background-color: var(--rh-green);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--rh-white);
+  font-weight: 600;
+}
+
+.ipo-bullets-text p {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+  color: var(--rh-black);
+}
+
+.ipo-bullets-text span {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--rh-gray-700);
+}
+
+.fractional-top {
+  margin-bottom: var(--spacing-2xl);
+}
+
+.fractional-middle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-2xl);
+}
+
+.fractional-middle-1 {
+  padding: var(--spacing-xl);
+  background-color: var(--rh-gray-50);
+  border-radius: var(--radius-lg);
+  transition: all 0.2s ease;
+}
+
+.fractional-middle-1:hover {
+  background-color: var(--rh-gray-100);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.fractional-middle-4 {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.fractional-middle-4 img {
+  max-width: 300px;
+  height: auto;
+}
+
+.fractional-text p {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+  color: var(--rh-black);
+}
+
+.fractional-text span {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--rh-gray-700);
+}
+
+.body__fee-disclosure {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  background-color: var(--rh-gray-50);
+  border-top: 1px solid var(--rh-gray-200);
+  border-bottom: 1px solid var(--rh-gray-200);
+}
+
+.body__fee-disclosure span {
+  font-size: 15px;
+  color: var(--rh-gray-700);
+  font-weight: 500;
 }
 
 /* Lists */
@@ -215,4 +322,88 @@ img {
   width: 100%;
   height: auto;
   display: block;
+}
+
+/* Tabs Section */
+.tabs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-3xl) var(--spacing-2xl);
+  gap: var(--spacing-3xl);
+  max-width: 1440px;
+  margin: 0 auto;
+  min-height: 600px;
+}
+
+.tabs-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  flex: 0 0 300px;
+}
+
+.tabButton {
+  background-color: transparent;
+  border: none;
+  font-size: 24px;
+  font-weight: 500;
+  padding: var(--spacing-lg);
+  cursor: pointer;
+  color: var(--rh-gray-600);
+  text-align: left;
+  border-radius: var(--radius-md);
+  transition: all 0.2s ease;
+}
+
+.tabButton:hover,
+.tabButton:focus {
+  color: var(--rh-green);
+  background-color: var(--rh-gray-100);
+  outline: none;
+}
+
+.tabs-right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2xl);
+  max-width: 800px;
+}
+
+.phone-screen {
+  flex-shrink: 0;
+  width: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phone-screen img {
+  width: 300px;
+  height: auto;
+  max-height: 600px;
+  object-fit: contain;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.tabs-right-text {
+  flex: 1;
+  max-width: 400px;
+}
+
+.tabs-right-text p {
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -1px;
+  line-height: 1.2;
+  margin-bottom: var(--spacing-lg);
+  color: var(--rh-black);
+}
+
+.tabs-right-text span {
+  font-size: 18px;
+  line-height: 1.6;
+  color: var(--rh-gray-800);
 }

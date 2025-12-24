@@ -12,20 +12,26 @@ function Watchlist() {
   const dispatch = useDispatch();
   const [hasFetchedStocks, setHasFetchedStocks] = useState(false);
 
+  // Fetch watchlist on mount
   useEffect(() => {
     dispatch(getAllInWatchList());
   }, [dispatch]);
 
+  // Fetch stock data when watchlist changes
   useEffect(() => {
-    const watchlistValuesArray = Object.values(watchlist);
-    if (watchlistValuesArray.length > 0 && !hasFetchedStocks) {
-      console.log('Fetching stocks for watchlist items...');
-      for (const stock of watchlistValuesArray) {
+    const watchlistArray = Object.values(watchlist || {});
+    
+    if (watchlistArray.length > 0 && !hasFetchedStocks) {
+      console.log('Fetching stocks for watchlist items:', watchlistArray.map(s => s.ticker));
+      
+      // Fetch each stock individually
+      watchlistArray.forEach((stock) => {
         dispatch(getSingleStock(stock.ticker));
-      }
+      });
+      
       setHasFetchedStocks(true);
     }
-  }, [watchlist.length, dispatch, hasFetchedStocks]);
+  }, [watchlist, dispatch, hasFetchedStocks]);
 
 
   return (
@@ -43,16 +49,26 @@ function Watchlist() {
             >
               <div className="watchlist-components">
                 <div className="watchlist-stock-info">
-                  {stockData?.logoUrl && (
+                  {(stockData?.logoUrl || stockData?.logoFallback) && (
                     <img 
-                      src={stockData.logoUrl}
+                      src={stockData.logoUrl || stockData.logoFallback}
                       alt={`${watchedStock.ticker} logo`}
                       className="stock-logo"
                       onError={(e) => {
-                        if (stockData?.logoFallback) {
+                        // First try logoFallback, then use UI Avatars as last resort
+                        if (e.target.src !== stockData?.logoFallback && stockData?.logoFallback) {
                           e.target.src = stockData.logoFallback;
+                        } else if (!e.target.src.includes('ui-avatars.com')) {
+                          e.target.src = `https://ui-avatars.com/api/?name=${watchedStock.ticker}&size=128&background=0066CC&color=fff&bold=true`;
                         }
                       }}
+                    />
+                  )}
+                  {!stockData?.logoUrl && !stockData?.logoFallback && (
+                    <img 
+                      src={`https://ui-avatars.com/api/?name=${watchedStock.ticker}&size=128&background=0066CC&color=fff&bold=true`}
+                      alt={`${watchedStock.ticker} logo`}
+                      className="stock-logo"
                     />
                   )}
                   <div className="ticker-info">

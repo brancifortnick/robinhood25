@@ -47,12 +47,13 @@
   max-width: 500px;
   flex-grow: 1;
   transition: all 0.2s ease;
+  position: relative;
 }
 
 #search-container:focus-within {
   background-color: var(--rh-white);
   border-color: var(--rh-black);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 #magnifier {
@@ -68,6 +69,7 @@
 
 #search_bar {
   width: 100%;
+  height: 100%;
   border: none;
   outline: none;
   background: transparent;

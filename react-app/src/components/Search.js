@@ -43,33 +43,48 @@ function Search() {
   }, [searchQuery])
 
   return (
-    <div>
-      <div>
-        <div>
-          <input
-            value={searchQuery}
-            onInput={e => setSearchQuery(e.target.value)}
-            type="search"
-            id="search-form"
-            class="search-bar-input"
-            placeholder="Search..."
-            autoComplete="off"
-          />
-        </div>
-        {/* <button
-          type="button"
-          className="search-button"
-          onClick={handleClick}
+    <div className="search-wrapper">
+      <div className="search-input-container">
+        <svg 
+          className="search-icon" 
+          width="20" 
+          height="20" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2"
         >
-          <i class="search-icon">search</i>
-        </button> */}
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input
+          value={searchQuery}
+          onInput={e => setSearchQuery(e.target.value)}
+          type="search"
+          id="search-form"
+          className="search-bar-input"
+          placeholder="Search stocks..."
+          autoComplete="off"
+        />
       </div>
-      {searchQuery && (
+      {searchQuery && tickersShown.length > 0 && (
         <div className="suggested-search-box">
-          {/* {tickersShown} */}
-          {tickersShown.map(ticker => <span onClick={() => {
-            handleClickSuggestions(ticker);
-          }}>{ticker}</span>)}
+          {tickersShown.map((ticker, index) => (
+            <div 
+              key={index}
+              className="search-result-item" 
+              onClick={() => handleClickSuggestions(ticker)}
+            >
+              <div className="search-result-ticker">{ticker}</div>
+            </div>
+          ))}
+        </div>
+      )}
+      {searchQuery && tickersShown.length === 0 && (
+        <div className="suggested-search-box">
+          <div className="search-no-results">
+            No results found for "{searchQuery}"
+          </div>
         </div>
       )}
     </div>

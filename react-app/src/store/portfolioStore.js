@@ -22,6 +22,7 @@ export const getPortfolio = () => async dispatch => {
 
 export const updateStock = (ticker, operator, price) => async dispatch => {
     if (operator === 'add' || operator === 'subtract') {
+        console.log(`Updating stock: ${ticker} ${operator} at price $${price}`);
         const response = await fetch(`/api/portfolio-stocks/${ticker}/${operator}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -29,7 +30,9 @@ export const updateStock = (ticker, operator, price) => async dispatch => {
         });
         if (response.ok) {
             const purchasedStock = await response.json();
+            console.log('Stock updated:', purchasedStock);
             dispatch(addStock(purchasedStock));
+            return purchasedStock;
         } else {
             const error = await response.json();
             console.error('Error updating stock:', error);

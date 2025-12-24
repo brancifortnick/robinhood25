@@ -1,62 +1,48 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import Stock from './Stock';
 import Portfolio from './Portfolio.js';
 import Watchlist from './Watchlist.js'
+import { getSingleStock } from '../store/stocksStore';
+import { getPortfolio } from '../store/portfolioStore';
 import "./HomePage.css"
-import { useDispatch } from 'react-redux';
-function HomePage({ ticker }) {
-        const dispatch = useDispatch();
 
-    const [data, setData] = useState(null);
-    ticker = data?.results?.ticker || "AAPL"
-    let tickerFunc= () => {
-        return {
-            ticker: ticker || "AAPL",
-            logo_url: data?.results?.brands?.logo_url || "https://static.robinhood.com/assets/logos/robinhood.png"
-            
-        }
-    }
+function HomePage() {
+    const dispatch = useDispatch();
+    const [defaultTicker] = useState("AAPL");
+    const portfolio = useSelector(state => state.portfolio);
+    const stocks = useSelector(state => state.stocks);
     
-    const trySafety = (func) => {
-        
-        try {
-            return func(tickerFunc());
-        } catch (e) {
-            console.error("Error executing function:", e);
-            return null;
-        }
-    };
-    trySafety(tickerFunc)
-    
+    // Get the first stock from portfolio or use AAPL
+    const portfolioTickers = Object.keys(portfolio || {});
+    const displayTicker = portfolioTickers[0] || defaultTicker;
+
     useEffect(() => {
-        const fetchData = async () => {
-            const response = await fetch(`/api/external-stocks/${ticker}/results/branding/${data?.results?.brands?.logo_url}`);
-            const resData = await response.json();
-            setData(resData);
-        }
-        fetchData();
+        // Fetch portfolio on mount
+        dispatch(getPortfolio());
+    }, [dispatch]);
 
-    }, [ticker, dispatch]);
+    useEffect(() => {
+        // Fetch the default stock data when ticker changes
+        if (displayTicker) {
+            dispatch(getSingleStock(displayTicker));
+        }
+    }, [dispatch, displayTicker]);
 
     return (
         <div id="home-container">
-
-
             <div id="homepage-left">
                 <div id="homepage-chart">
-                    <Stock ticker={"AAPL"} />
+                    <Stock ticker={displayTicker} />
                 </div>
 
                 <div id="homepage-portfolio-title">Your Portfolio</div>
-                <div id="homepage-portfolio"><Portfolio ticker={ticker} /></div>
+                <div id="homepage-portfolio"><Portfolio /></div>
             </div>
-
 
             <div id="homepage-right">
                 <Watchlist />
-            </div >
-
-
+            </div>
         </div>
     )
 }

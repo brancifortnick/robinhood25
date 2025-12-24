@@ -31,8 +31,10 @@ ChartJS.register(
   Filler
 );
 
-function Stock() {
-  const { ticker } = useParams();
+function Stock({ ticker: propTicker }) {
+  const { ticker: urlTicker } = useParams();
+  const ticker = urlTicker || propTicker || "AAPL"; // Use URL param, then prop, then default
+  
   const [timePeriod, setTimePeriod] = useState('dailyPrices')
   const [hoveredPrice, setHoveredPrice] = useState(null)
   const [hoveredTime, setHoveredTime] = useState(null)
@@ -194,11 +196,14 @@ function Stock() {
 
   useEffect(() => {
     // Fetch stock data only when ticker changes
-    dispatch(getSingleStock(ticker));
+    if (ticker && ticker !== 'undefined') {
+      console.log('Fetching stock data for:', ticker);
+      dispatch(getSingleStock(ticker));
+    }
   }, [dispatch, ticker])
 
   useEffect(() => {
-    if (stocks[ticker] && stocks[ticker][timePeriod] && Array.isArray(stocks[ticker][timePeriod])) {
+    if (ticker && stocks[ticker] && stocks[ticker][timePeriod] && Array.isArray(stocks[ticker][timePeriod])) {
       const priceData = stocks[ticker][timePeriod];
       const labels = getTimeLabels(timePeriod, priceData.length);
       
@@ -245,10 +250,20 @@ function Stock() {
   return (
 
     <div className="graphContainer">
+      {!ticker || ticker === 'undefined' ? (
+        <div style={{height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+          <h3>No ticker selected</h3>
+        </div>
+      ) : !stocks[ticker] ? (
+        <div style={{height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+          <h3>Loading stock data for {ticker}...</h3>
+        </div>
+      ) : (
+        <>
       <div className={"stockstuff2"}>
-        {stocks[ticker]?.logoUrl && (
+        {(stocks[ticker]?.logoUrl || stocks[ticker]?.logoFallback) && (
           <img 
-            src={stocks[ticker].logoUrl} 
+            src={stocks[ticker]?.logoUrl || stocks[ticker]?.logoFallback} 
             alt={`${ticker} logo`}
             style={{
               width: '48px',
@@ -260,10 +275,27 @@ function Stock() {
               padding: '4px'
             }}
             onError={(e) => {
-              // Fallback to the backup logo if primary fails
-              if (stocks[ticker]?.logoFallback) {
+              // First try logoFallback, then use UI Avatars as last resort
+              if (e.target.src !== stocks[ticker]?.logoFallback && stocks[ticker]?.logoFallback) {
                 e.target.src = stocks[ticker].logoFallback;
+              } else if (!e.target.src.includes('ui-avatars.com')) {
+                e.target.src = `https://ui-avatars.com/api/?name=${ticker}&size=128&background=0066CC&color=fff&bold=true`;
               }
+            }}
+          />
+        )}
+        {!stocks[ticker]?.logoUrl && !stocks[ticker]?.logoFallback && (
+          <img 
+            src={`https://ui-avatars.com/api/?name=${ticker}&size=128&background=0066CC&color=fff&bold=true`}
+            alt={`${ticker} logo`}
+            style={{
+              width: '48px',
+              height: '48px',
+              borderRadius: '8px',
+              marginRight: '12px',
+              objectFit: 'contain',
+              background: 'white',
+              padding: '4px'
             }}
           />
         )}
@@ -352,6 +384,8 @@ function Stock() {
       <div>
 
       </div>
+      </>
+      )}
     </div>
 
 

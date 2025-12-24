@@ -29,12 +29,15 @@
 }
 
 #homepage-chart {
-  height: 400px;
+  height: 450px;
   position: relative;
   overflow: hidden;
-  margin-bottom: var(--spacing-2xl);
+  margin-bottom: var(--spacing-3xl);
   background-color: var(--rh-white);
   border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  border: 1px solid var(--rh-gray-200);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 #homepage-portfolio {
@@ -50,6 +53,8 @@
   position: sticky;
   top: 88px;
   align-self: flex-start;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
 }
 
 .graph {
@@ -61,6 +66,49 @@
   padding: 0;
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.stockstuff2 {
+  display: flex;
+  align-items: center;
+  padding-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  border-bottom: 1px solid var(--rh-gray-200);
+}
+
+#stock_name {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--rh-black);
+  margin-bottom: var(--spacing-xs);
+}
+
+#stock-price-spacer {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+#stock_price {
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -1px;
+  color: var(--rh-black);
+}
+
+#stock_percent {
+  font-size: 17px;
+  font-weight: 500;
+}
+
+#stock_percent.positive {
+  color: var(--rh-green);
+}
+
+#stock_percent.negative {
+  color: var(--rh-red);
 }
 
 /* Portfolio Value Display */

@@ -81,21 +81,38 @@ function Portfolio() {
             return (
               <tr key={stock.ticker}>
                 <td>
-                  <Link to={`/stocks/${stock.ticker}`} style={{ 
+                  <Link to={`/asset/${stock.ticker}`} style={{ 
                     display: 'flex', 
                     alignItems: 'center', 
                     gap: 'var(--spacing-md)',
                     textDecoration: 'none',
                     color: 'inherit'
                   }}>
-                    {priceData.logoUrl && (
+                    {(priceData.logoUrl || priceData.logoFallback) && (
                       <img 
-                        src={priceData.logoUrl} 
+                        src={priceData.logoUrl || priceData.logoFallback} 
                         alt={stock.ticker}
                         onError={(e) => {
                           e.target.onerror = null;
-                          e.target.src = priceData.logoFallback;
+                          if (e.target.src !== priceData.logoFallback && priceData.logoFallback) {
+                            e.target.src = priceData.logoFallback;
+                          } else {
+                            e.target.src = `https://ui-avatars.com/api/?name=${stock.ticker}&size=128&background=0066CC&color=fff&bold=true`;
+                          }
                         }}
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                          borderRadius: 'var(--radius-sm)',
+                          border: '1px solid var(--rh-gray-300)',
+                          objectFit: 'cover'
+                        }}
+                      />
+                    )}
+                    {!priceData.logoUrl && !priceData.logoFallback && (
+                      <img 
+                        src={`https://ui-avatars.com/api/?name=${stock.ticker}&size=128&background=0066CC&color=fff&bold=true`}
+                        alt={stock.ticker}
                         style={{
                           width: '32px',
                           height: '32px',

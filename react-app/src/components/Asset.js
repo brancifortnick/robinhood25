@@ -31,16 +31,20 @@ export default function Asset() {
                     <br />
                 </div>
                 <div className={"about"}>
-                    <div><p>Market Cap</p><span>${stock?.marketCap ? (stock.marketCap / 1000000).toFixed(0) : 0}M</span></div>
-                    <div><p>Homepage</p><span>{stock?.homepage_url || 'N/A'}</span></div>
-                    <div><p>Current Price</p><span>${stock?.currentPrice || '0.00'}</span></div>
-                    <div><p>Price Change</p><span>{stock?.percentText || '0%'}</span></div>
+                    <div><p>Market Cap</p><span>{stock?.marketCapFormatted || `$${stock?.marketCap ? (stock.marketCap / 1000000).toFixed(0) : 0}M`}</span></div>
+                    <div><p>Homepage</p><span>{stock?.homepage_url && stock.homepage_url !== 'N/A' ? (
+                        <a href={stock.homepage_url} target="_blank" rel="noopener noreferrer" style={{color: 'rgb(0,200,5)', textDecoration: 'none'}}>
+                            {stock.homepage_url.replace(/https?:\/\/(www\.)?/, '')}
+                        </a>
+                    ) : 'N/A'}</span></div>
+                    <div><p>Current Price</p><span>${stock?.currentPrice ? stock.currentPrice.toFixed(2) : '0.00'}</span></div>
+                    <div><p>Price Change</p><span style={{color: stock?.percentText?.startsWith('+') ? 'rgb(0,200,5)' : 'rgb(255,80,0)'}}>{stock?.percentText || '0%'}</span></div>
                 </div>
                 <div className="titles">Key Statistics</div>
                 <div className={"key-statistics"}>
-                    <div><p style={{"paddingRight":"4px"}}>Price-Earnings Ratio</p><span>N/A</span></div>
-                    <div><p>Dividend Yield</p><span>N/A</span></div>
-                    <div><p>Average Volume</p><span>N/A</span></div>
+                    <div><p style={{"paddingRight":"4px"}}>Price-Earnings Ratio</p><span>{stock?.peRatio || 'N/A'}</span></div>
+                    <div><p>Dividend Yield</p><span>{stock?.dividendYield || 'N/A'}</span></div>
+                    <div><p>Average Volume</p><span>{stock?.averageVolume || 'N/A'}</span></div>
                 </div>
                 <div className="titles">News</div>
                 <div id="news-container">
