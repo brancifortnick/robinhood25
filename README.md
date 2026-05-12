@@ -1,6 +1,6 @@
 # [Visit RobinCould - a Robinhood Clone](https://robin-hood-clone-74aef86e2cd5.herokuapp.com/)
 **Site no longer live**
-A Robinhood clone with real-time stock data powered by **Alpha Vantage API** (free!)
+**A Robinhood clone with real-time stock data powered by **Alpha Vantage API** (free!)
 
 
 Refactor of RobinCould with a functioning API.
